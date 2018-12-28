@@ -1,0 +1,39 @@
+my_robo:
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 50
+
+  base1_controller:
+    type: position_controllers/JointPositionController
+    joint: base_joint1
+    pid: {p: 0.1, i: 0.1, d: 0.1}
+  wheel1_controller:
+    type: velocity_controllers/JointVelocityController
+    joint: wheel1_joint
+    pid: {p: 0.1, i: 0.00, d: 0.00}
+  base2_controller:
+    type: position_controllers/JointPositionController
+    joint: base_joint2
+    pid: {p: 0.1, i: 0.1, d: 0.1}
+  wheel2_controller:
+    type: velocity_controllers/JointVelocityController
+    joint: wheel2_joint
+    pid: {p: 0.1, i: 0.00, d: 0.00}
+
+  base3_controller:
+    type: position_controllers/JointPositionController
+    joint: base_joint3
+    pid: {p: 0.1, i: 0.1, d: 0.1}
+  wheel3_controller:
+    type: velocity_controllers/JointVelocityController
+    joint: wheel3_joint
+    pid: {p: 0.1, i: 0.00, d: 0.00}
+
+  base4_controller:
+    type: position_controllers/JointPositionController
+    joint: base_joint4
+    pid: {p: 0.1, i: 0.1, d: 0.1}
+  wheel4_controller:
+    type: velocity_controllers/JointVelocityController
+    joint: wheel4_joint
+    pid: {p: 0.1, i: 0.00, d: 0.00}

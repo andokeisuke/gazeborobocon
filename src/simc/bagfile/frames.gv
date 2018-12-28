@@ -1,0 +1,21 @@
+digraph G {
+"base_footprint" -> "base_link"[label="Broadcaster: /my_robo/robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 760.588 sec old)\nBuffer length: 0.000 sec\n"];
+"base_link" -> "hokuyo_link"[label="Broadcaster: /my_robo/robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 760.588 sec old)\nBuffer length: 0.000 sec\n"];
+"base_link" -> "base_wheel1_link"[label="Broadcaster: /my_robo/robot_state_publisher\nAverage rate: 50.242 Hz\nMost recent transform: 760.570 ( 0.018 sec old)\nBuffer length: 4.140 sec\n"];
+"base_link" -> "base_wheel2_link"[label="Broadcaster: /my_robo/robot_state_publisher\nAverage rate: 50.242 Hz\nMost recent transform: 760.570 ( 0.018 sec old)\nBuffer length: 4.140 sec\n"];
+"base_link" -> "base_wheel3_link"[label="Broadcaster: /my_robo/robot_state_publisher\nAverage rate: 50.242 Hz\nMost recent transform: 760.570 ( 0.018 sec old)\nBuffer length: 4.140 sec\n"];
+"base_link" -> "base_wheel4_link"[label="Broadcaster: /my_robo/robot_state_publisher\nAverage rate: 50.242 Hz\nMost recent transform: 760.570 ( 0.018 sec old)\nBuffer length: 4.140 sec\n"];
+"base_wheel1_link" -> "wheel1"[label="Broadcaster: /my_robo/robot_state_publisher\nAverage rate: 50.242 Hz\nMost recent transform: 760.570 ( 0.018 sec old)\nBuffer length: 4.140 sec\n"];
+"base_wheel2_link" -> "wheel2"[label="Broadcaster: /my_robo/robot_state_publisher\nAverage rate: 50.242 Hz\nMost recent transform: 760.570 ( 0.018 sec old)\nBuffer length: 4.140 sec\n"];
+"base_wheel3_link" -> "wheel3"[label="Broadcaster: /my_robo/robot_state_publisher\nAverage rate: 50.242 Hz\nMost recent transform: 760.570 ( 0.018 sec old)\nBuffer length: 4.140 sec\n"];
+"base_wheel4_link" -> "wheel4"[label="Broadcaster: /my_robo/robot_state_publisher\nAverage rate: 50.242 Hz\nMost recent transform: 760.570 ( 0.018 sec old)\nBuffer length: 4.140 sec\n"];
+"map" -> "odom"[label="Broadcaster: /slam_gmapping\nAverage rate: 20.244 Hz\nMost recent transform: 760.607 ( -0.019 sec old)\nBuffer length: 4.100 sec\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 760.588"[ shape=plaintext ] ;
+ }->"base_footprint";
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 760.588"[ shape=plaintext ] ;
+ }->"map";
+}

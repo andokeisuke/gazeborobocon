@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <property name="M_PI" value="3.14159274"/>
+
+  <xacro:macro name="cylinder_inertial" params="mass radius length">
+	<mass value="${mass}"/>
+	<inertia ixx="${((radius*radius)/4 + (length*length)/12)*mass}" ixy="0" ixz="0"
+			 iyy="${((radius*radius)/4 + (length*length)/12)*mass}" iyz="0"
+			 izz="${(mass*radius*radius)/2}" />
+  </xacro:macro>
+
+  <xacro:macro name="box_inertial" params="mass height width depth">
+	<mass value="${mass}"/>
+	<inertia ixx="${(mass*(height*height+width*width))/12}" ixy="0" ixz="0"
+			 iyy="${(mass*(height*height+depth*depth))/12}" iyz="0"
+			 izz="${(mass*(width*width+depth*depth))/12}" />
+  </xacro:macro>
+
+
+<xacro:macro name="box_create" params="mass height width depth">
+	<visual>
+      <geometry>
+        <box size="${width} ${depth} ${height}"/>
+      </geometry>
+    </visual>
+
+    <collision>
+      <geometry>
+        <box size="${width} ${depth} ${height}"/>
+      </geometry>
+    </collision>
+
+
+
+   <inertial>
+    	<origin xyz="0 0 0"/>
+    	<box_inertial mass="${mass}" height="${height}" width="${width}" depth="${depth}"/>
+   </inertial>
+  </xacro:macro>
+
+
+<xacro:macro name="cylinder_create" params="rpy mass radius length">
+	<visual>
+	<origin rpy="${rpy} 0 0" xyz="0 0 0"/>
+      <geometry>
+      <cylinder radius="${radius}" length="${length}"/>
+      </geometry>
+    </visual>
+
+
+    <collision>
+	<origin rpy="${rpy} 0 0" xyz="0 0 0"/>
+      <geometry>
+      <cylinder radius="${radius}" length="${length}"/>
+      </geometry>
+    </collision>
+
+   <inertial>
+    <origin xyz="0 0 0"/>
+    <cylinder_inertial mass="${mass}" radius="${radius}" length="${length}"/>
+   </inertial>
+  </xacro:macro>
+
+
+<xacro:macro name="unit_create" params="base_name wheel_name">
+	<link name="${base_name}">
+    <cylinder_create rpy="0" mass="0.1" radius="0.05" length="0.01"/>
+  </link>
+
+
+  <link name="${wheel_name}">
+    <cylinder_create rpy="${M_PI/2}" mass="0.1" radius="0.05" length="0.05"/>
+  </link>
+  </xacro:macro>
+
+<xacro:macro name="trans_create" params="base_joint_name wheel_name">
+
+
+<transmission name="${base_joint_name}_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${base_joint_name}">
+  <hardwareInterface>PositionJointInterface</hardwareInterface>
+      </joint>
+   <actuator name="${base_joint_name}_motor">
+  <hardwareInterface>PositionJointInterface</hardwareInterface>
+  <mechanicalReduction>100</mechanicalReduction>
+      </actuator>
+ </transmission>
+<transmission name="${wheel_name}_joint_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${wheel_name}_joint">
+  <hardwareInterface>VelocityJointInterface</hardwareInterface>
+      </joint>
+   <actuator name="${wheel_name}_motor">
+  <hardwareInterface>VelocityJointInterface</hardwareInterface>
+  <mechanicalReduction>100</mechanicalReduction>
+      </actuator>
+ </transmission>
+  </xacro:macro>
+</robot>
