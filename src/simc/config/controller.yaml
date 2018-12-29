@@ -3,37 +3,43 @@ my_robo:
     type: joint_state_controller/JointStateController
     publish_rate: 50
 
-  base1_controller:
+  left_front_steering_controller:
     type: position_controllers/JointPositionController
-    joint: base_joint1
+    joint: left_front_steering_joint
     pid: {p: 0.1, i: 0.1, d: 0.1}
-  wheel1_controller:
-    type: velocity_controllers/JointVelocityController
-    joint: wheel1_joint
-    pid: {p: 0.1, i: 0.00, d: 0.00}
-  base2_controller:
+
+  left_rear_steering_controller:
     type: position_controllers/JointPositionController
-    joint: base_joint2
+    joint: left_rear_steering_joint
     pid: {p: 0.1, i: 0.1, d: 0.1}
-  wheel2_controller:
+
+  right_front_steering_controller:
+    type: position_controllers/JointPositionController
+    joint: right_front_steering_joint
+    pid: {p: 0.1, i: 0.1, d: 0.1}
+
+  right_rear_steering_controller:
+    type: position_controllers/JointPositionController
+    joint: right_rear_steering_joint
+    pid: {p: 0.1, i: 0.1, d: 0.1}
+
+
+  left_front_wheel_controller:
     type: velocity_controllers/JointVelocityController
-    joint: wheel2_joint
+    joint: left_front_wheel_joint
     pid: {p: 0.1, i: 0.00, d: 0.00}
 
-  base3_controller:
-    type: position_controllers/JointPositionController
-    joint: base_joint3
-    pid: {p: 0.1, i: 0.1, d: 0.1}
-  wheel3_controller:
+  left_rear_wheel_controller:
     type: velocity_controllers/JointVelocityController
-    joint: wheel3_joint
+    joint: left_rear_wheel_joint
     pid: {p: 0.1, i: 0.00, d: 0.00}
 
-  base4_controller:
-    type: position_controllers/JointPositionController
-    joint: base_joint4
-    pid: {p: 0.1, i: 0.1, d: 0.1}
-  wheel4_controller:
+  right_front_wheel_controller:
     type: velocity_controllers/JointVelocityController
-    joint: wheel4_joint
+    joint: right_front_wheel_joint
+    pid: {p: 0.1, i: 0.00, d: 0.00}
+
+  right_rear_wheel_controller:
+    type: velocity_controllers/JointVelocityController
+    joint: right_rear_wheel_joint
     pid: {p: 0.1, i: 0.00, d: 0.00}

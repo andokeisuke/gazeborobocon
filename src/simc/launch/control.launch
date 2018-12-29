@@ -5,7 +5,15 @@
  
   <!-- load the controllers -->
   <node name="controller_spawner" pkg="controller_manager" type="spawner" ns="my_robo" output="screen"
-  args="joint_state_controller base1_controller wheel1_controller base2_controller wheel2_controller base3_controller wheel3_controller base4_controller wheel4_controller"/>
+  args="joint_state_controller
+	left_front_steering_controller 
+	left_rear_steering_controller 
+	right_front_steering_controller 
+	right_rear_steering_controller 
+	left_front_wheel_controller 
+	left_rear_wheel_controller
+	right_front_wheel_controller 
+	right_rear_wheel_controller"/>
  
   <!-- convert joint states to TF transforms for rviz, etc -->
   <node name="robot_state_publisher" pkg="robot_state_publisher"
@@ -14,3 +22,4 @@
   </node>
  
 </launch>
+

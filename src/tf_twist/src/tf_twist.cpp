@@ -9,7 +9,15 @@
 #include<sstream>
 int thetachange(float x,float y);
 ros::Subscriber sub;
-ros::Publisher base_pub,base1_pub,base2_pub,base3_pub,base4_pub,wheel1_pub,wheel2_pub,wheel3_pub,wheel4_pub;
+ros::Publisher	base_pub,
+				left_front_steering_pub,
+				left_rear_steering_pub,
+				right_front_steering_pub,
+				right_rear_steering_pub,
+				left_front_wheel_pub,
+				left_rear_wheel_pub,
+				right_front_wheel_pub,
+				right_rear_wheel_pub;
 
 void messageCallback(const geometry_msgs::Twist::ConstPtr& msg){
 	//pub side
@@ -21,23 +29,16 @@ void messageCallback(const geometry_msgs::Twist::ConstPtr& msg){
 		v.data=-v.data;
 
 	}
-	v.data=10000*v.data;
+	v.data=50*v.data;
 	  base_pub.publish(theta);
-		base1_pub.publish(theta);
-		base2_pub.publish(theta);
-		base3_pub.publish(theta);
-		base4_pub.publish(theta);
-		wheel1_pub.publish(v);
-		wheel2_pub.publish(v);
-		wheel3_pub.publish(v);
-		wheel4_pub.publish(v);
-
-
-
-
-
-
-
+		left_front_steering_pub.publish(theta);
+		left_rear_steering_pub.publish(theta);
+		right_front_steering_pub.publish(theta);
+		right_rear_steering_pub.publish(theta);
+		left_front_wheel_pub.publish(v);
+		left_rear_wheel_pub.publish(v);
+		right_front_wheel_pub.publish(v);
+		right_rear_wheel_pub.publish(v);
 }
 
 int main(int argc,char **argv){
@@ -46,14 +47,14 @@ int main(int argc,char **argv){
 
 	sub = nh.subscribe("sub",10,messageCallback);
 	base_pub = nh.advertise<std_msgs::Float64>("/my_robo/base_controller/command",1);
-	base1_pub = nh.advertise<std_msgs::Float64>("/my_robo/base1_controller/command",1);
-	base2_pub = nh.advertise<std_msgs::Float64>("/my_robo/base2_controller/command",1);
-	base3_pub = nh.advertise<std_msgs::Float64>("/my_robo/base3_controller/command",1);
-	base4_pub = nh.advertise<std_msgs::Float64>("/my_robo/base4_controller/command",1);
-	wheel1_pub = nh.advertise<std_msgs::Float64>("/my_robo/wheel1_controller/command",1);
-	wheel2_pub = nh.advertise<std_msgs::Float64>("/my_robo/wheel2_controller/command",1);
-	wheel3_pub = nh.advertise<std_msgs::Float64>("/my_robo/wheel3_controller/command",1);
-	wheel4_pub = nh.advertise<std_msgs::Float64>("/my_robo/wheel4_controller/command",1);
+	left_front_steering_pub = nh.advertise<std_msgs::Float64>("/my_robo/left_front_steering_controller/command",1);
+	left_rear_steering_pub = nh.advertise<std_msgs::Float64>("/my_robo/left_rear_steering_controller/command",1);
+	right_front_steering_pub = nh.advertise<std_msgs::Float64>("/my_robo/right_front_steering_controller/command",1);
+	right_rear_steering_pub = nh.advertise<std_msgs::Float64>("/my_robo/right_rear_steering_controller/command",1);
+	left_front_wheel_pub = nh.advertise<std_msgs::Float64>("/my_robo/left_front_wheel_controller/command",1);
+	left_rear_wheel_pub = nh.advertise<std_msgs::Float64>("/my_robo/left_rear_wheel_controller/command",1);
+	right_front_wheel_pub = nh.advertise<std_msgs::Float64>("/my_robo/right_front_wheel_controller/command",1);
+	right_rear_wheel_pub = nh.advertise<std_msgs::Float64>("/my_robo/right_rear_wheel_controller/command",1);
 
 	ros::spin();
 	return 0;
@@ -79,8 +80,6 @@ int thetachange(float x,float y){
 		theta = 180;
 
 	}
-
-
 	return theta;
 
 }
