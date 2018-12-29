@@ -16,11 +16,6 @@
 
   <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
     args="-urdf -model my_robo -param robot_description"/>
- <node name="tf_twist" type="tf_twist" pkg="tf_twist" />
-	<node name="joycon" type="joycon_gazebo" pkg="joycon" />
-	<node name="joy_node" type="joy_node" pkg="joy">
-		<param name="dev" type="string" value="/dev/input/js1"/>
-	</node>
 
-<node name="odom" pkg="odm" type="odom" />
 </launch>
+

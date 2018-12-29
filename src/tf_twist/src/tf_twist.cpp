@@ -29,7 +29,7 @@ void messageCallback(const geometry_msgs::Twist::ConstPtr& msg){
 		v.data=-v.data;
 
 	}
-	v.data=50*v.data;
+	v.data=10000*v.data;
 	  base_pub.publish(theta);
 		left_front_steering_pub.publish(theta);
 		left_rear_steering_pub.publish(theta);
