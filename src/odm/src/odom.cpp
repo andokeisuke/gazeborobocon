@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 #include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
-#include<gazebo_msgs/LinkStates.h>
+#include <gazebo_msgs/LinkStates.h>
 
     double state_odom_x=0.0;//オドメトリX座標[m]
     double state_odom_y=0.0;//オドメトリY座標[m]
