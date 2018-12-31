@@ -8,10 +8,10 @@
 #include <fcntl.h>
 using namespace std;
 
-#define MAX_VEL 0.5//m/s
-#define MIN_VEL -0.5//m/s
-#define MAX_ANGULAR_VEL 2.3//m/s
-#define MIN_ANGULAR_VEL -2.3//m/s
+#define MAX_VEL 2.0//m/s
+#define MIN_VEL -2.0//m/s
+#define MAX_ANGULAR_VEL 2.0//m/s
+#define MIN_ANGULAR_VEL -2.0//m/s
 
 
 int kbhit(void)
