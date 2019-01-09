@@ -26,7 +26,7 @@
 
     <collision>
       <geometry>
-        <box size="${width} ${depth} ${height}"/>
+      <box size="${width} ${depth} ${height}"/>
       </geometry>
     </collision>
 
@@ -64,12 +64,12 @@
 
 <xacro:macro name="unit_create" params="base_name wheel_name">
 	<link name="${base_name}">
-    <cylinder_create rpy="0" mass="0.1" radius="0.05" length="0.01"/>
+    <cylinder_create rpy="0" mass="0.1" radius="0.05" length="0.004"/>
   </link>
 
 
   <link name="${wheel_name}">
-    <cylinder_create rpy="${M_PI/2}" mass="0.1" radius="0.05" length="0.05"/>
+    <cylinder_create rpy="${M_PI/2}" mass="0.1" radius="0.05" length="0.01"/>
   </link>
   </xacro:macro>
 

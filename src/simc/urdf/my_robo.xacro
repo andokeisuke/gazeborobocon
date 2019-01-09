@@ -9,7 +9,7 @@
 
 
  <link name="base_link">
-    <box_create mass="10" height="0.1" width="0.8" depth="0.8"/>
+    <box_create mass="30" height="0.004" width="0.877" depth="0.877"/>
 
  </link>
 
@@ -18,14 +18,14 @@
   <joint name="base_joint1" type="continuous">
     <parent link="base_link"/>
     <child link="base_wheel1_link"/>
-    <origin rpy="0 0 0" xyz="0.35 0.35 -0.055"/>
+    <origin rpy="0 0 0" xyz="0.265 0.265 0"/>
     <axis xyz="0 0 1"/>
   </joint>
 
   <joint name="wheel1_joint" type="continuous">
     <parent link="base_wheel1_link"/>
     <child link="wheel1"/>
-    <origin rpy="0 0 0" xyz="0 0 -0.055"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028"/>
     <axis xyz="0 1 0"/>
   </joint>
 
@@ -38,14 +38,14 @@
   <joint name="base_joint2" type="continuous">
     <parent link="base_link"/>
     <child link="base_wheel2_link"/>
-    <origin rpy="0 0 0" xyz="-0.35 0.35 -0.055"/>
+    <origin rpy="0 0 0" xyz="-0.265 0.265 0"/>
     <axis xyz="0 0 1"/>
   </joint>
 
   <joint name="wheel2_joint" type="continuous">
     <parent link="base_wheel2_link"/>
     <child link="wheel2"/>
-    <origin rpy="0 0 0" xyz="0 0 -0.055"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028"/>
     <axis xyz="0 1 0"/>
   </joint>
 
@@ -55,14 +55,14 @@
   <joint name="base_joint3" type="continuous">
     <parent link="base_link"/>
     <child link="base_wheel3_link"/>
-    <origin rpy="0 0 0" xyz="0.35 -0.35 -0.055"/>
+    <origin rpy="0 0 0" xyz="-0.265 -0.265 0"/>
     <axis xyz="0 0 1"/>
   </joint>
 
   <joint name="wheel3_joint" type="continuous">
     <parent link="base_wheel3_link"/>
     <child link="wheel3"/>
-    <origin rpy="0 0 0" xyz="0 0 -0.055"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028"/>
     <axis xyz="0 1 0"/>
   </joint>
 
@@ -74,16 +74,16 @@
   <joint name="base_joint4" type="continuous">
     <parent link="base_link"/>
     <child link="base_wheel4_link"/>
-    <origin rpy="0 0 0" xyz="-0.35 -0.35 -0.055"/>
+    <origin rpy="0 0 0" xyz="0.265 -0.265 0"/>
     <axis xyz="0 0 1"/>
   </joint>
 
   <joint name="wheel4_joint" type="continuous">
     <parent link="base_wheel4_link"/>
     <child link="wheel4"/>
-    <origin rpy="0 0 0" xyz="0 0 -0.055"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028"/>
     <axis xyz="0 1 0"/>
-  </joint>
+  </joint>-->
 
 
 
@@ -91,13 +91,13 @@
   <joint name="base_joint" type="fixed">
    <parent link="base_footprint"/>
    <child link="base_link"/>
-   <origin rpy="0 0 0" xyz="0 0 0.16"/>
+   <origin rpy="0 0 0" xyz="0 0 0.022"/>
 
  </joint>
 
 
-  <!-- Hokuyo Laser -->
-  <link name="hokuyo_link">
+Hokuyo Laser 
+  <link name="hokuyo_link1">
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
@@ -114,12 +114,36 @@
 
 
   </link>
-  <joint name="hokuyo_joint" type="fixed">
+  <joint name="hokuyo_joint1" type="fixed">
     <axis xyz="0 1 0" />
-    <origin xyz="0 0.4 0.1" rpy="0 0 1.5"/>
+    <origin xyz="0.4385 -0.4385 0.002" rpy="0 0 ${M_PI*3/4}"/>
     <parent link="base_link"/>
-    <child link="hokuyo_link"/>
+    <child link="hokuyo_link1"/>
   </joint>
+
+  <link name="hokuyo_link2">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.1 0.1 0.1"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://rrbot_description/meshes/hokuyo.dae"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="hokuyo_joint2" type="fixed">
+    <axis xyz="0 1 0" />
+    <origin xyz="-0.4385 0.4385 0.002" rpy="0 0 ${-M_PI/4}"/>
+    <parent link="base_link"/>
+    <child link="hokuyo_link2"/>
+  </joint>
+
 
 <link name="marker1">
 
@@ -201,7 +225,7 @@
 
 
   <!-- ===============  Transmission ===============-->
- <trans_create base_joint_name="base_joint1" wheel_name="wheel1"/>
+<trans_create base_joint_name="base_joint1" wheel_name="wheel1"/>
 <trans_create base_joint_name="base_joint2" wheel_name="wheel2"/>
 <trans_create base_joint_name="base_joint3" wheel_name="wheel3"/>
 <trans_create base_joint_name="base_joint4" wheel_name="wheel4"/>
@@ -225,63 +249,61 @@
 
  <gazebo reference="base_wheel1_link">
    <selfCollide>true</selfCollide>
-     <!-- This caster is no frictional resistance. -->
       <mu1 value="${mu}" />
     <mu2 value="${mu}" />
   </gazebo>
 
 <gazebo reference="wheel1">
    <selfCollide>true</selfCollide>
-     <!-- This caster is no frictional resistance. -->
+
     <mu1 value="${mu}" />
     <mu2 value="${mu}" />
   </gazebo>
 
 
 
- <gazebo reference="base_wheel2_link">
+  <gazebo reference="base_wheel2_link">
    <selfCollide>true</selfCollide>
-     <!-- This caster is no frictional resistance. -->
+
     <mu1 value="${mu}" />
     <mu2 value="${mu}" />
   </gazebo>
 
 <gazebo reference="wheel2">
    <selfCollide>true</selfCollide>
-     <!-- This caster is no frictional resistance. -->
+
     <mu1 value="${mu}" />
     <mu2 value="${mu}" />
   </gazebo>
 
  <gazebo reference="base_wheel3_link">
    <selfCollide>true</selfCollide>
-     <!-- This caster is no frictional resistance. -->
+
     <mu1 value="${mu}" />
     <mu2 value="${mu}" />
   </gazebo>
 
 <gazebo reference="wheel3">
    <selfCollide>true</selfCollide>
-     <!-- This caster is no frictional resistance. -->
+
     <mu1 value="${mu}" />
     <mu2 value="${mu}" />
 </gazebo>
  <gazebo reference="base_wheel4_link">
    <selfCollide>true</selfCollide>
-     <!-- This caster is no frictional resistance. -->
+
     <mu1 value="${mu}" />
     <mu2 value="${mu}" />
   </gazebo>
 
 <gazebo reference="wheel4">
    <selfCollide>true</selfCollide>
-     <!-- This caster is no frictional resistance. -->
+
     <mu1 value="${mu}" />
     <mu2 value="${mu}" />
   </gazebo>
-
-  <!-- hokuyo -->
-  <gazebo reference="hokuyo_link">
+  <!-- hokuyo-->
+  <gazebo reference="hokuyo_link1">
     <sensor type="ray" name="head_hokuyo_sensor">
       <pose>0 0 0 0 0 0</pose>
       <visualize>false</visualize>
@@ -302,7 +324,7 @@
         </range>
         <noise>
           <type>gaussian</type>
-          <!-- Noise parameters based on published spec for Hokuyo laser
+          <!--Noise parameters based on published spec for Hokuyo laser
                achieving "+-30mm" accuracy at range < 10m.  A mean of 0.0m and
                stddev of 0.01m will put 99.7% of samples within 0.03m of the true
                reading. -->
@@ -311,10 +333,46 @@
         </noise>
       </ray>
       <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
-        <topicName>/rrbot/laser/scan</topicName>
-        <frameName>hokuyo_link</frameName>
+        <topicName>/rrbot/laser/scan1</topicName>
+        <frameName>hokuyo_link1</frameName>
       </plugin>
     </sensor>
   </gazebo>
 
+
+  <gazebo reference="hokuyo_link2">
+    <sensor type="ray" name="head_hokuyo_sensor">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>false</visualize>
+      <update_rate>40</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>720</samples>
+            <resolution>1</resolution>
+            <min_angle>-1.570796</min_angle>
+            <max_angle>1.570796</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.10</min>
+          <max>30.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+         <!-- Noise parameters based on published spec for Hokuyo laser
+               achieving "+-30mm" accuracy at range < 10m.  A mean of 0.0m and
+               stddev of 0.01m will put 99.7% of samples within 0.03m of the true
+               reading. -->
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
+        <topicName>/rrbot/laser/scan2</topicName>
+        <frameName>hokuyo_link2</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
 </robot>
