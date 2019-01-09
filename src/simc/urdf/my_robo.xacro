@@ -6,8 +6,10 @@
 <xacro:property name="mu" value="0.5"/>
 
 
+
+
  <link name="base_link">
-    <box_create mass="10" height="0.1" width="0.8" depth="0.8"/>
+    <box_create mass="30" height="0.004" width="0.877" depth="0.877"/>
 
  </link>
 
@@ -16,14 +18,14 @@
   <joint name="left_front_steering_joint" type="continuous">
     <parent link="base_link"/>
     <child link="left_front_steering"/>
-    <origin rpy="0 0 0" xyz="0.35 0.35 -0.055"/>
+    <origin rpy="0 0 0" xyz="0.265 0.265 0"/>
     <axis xyz="0 0 1"/>
   </joint>
 
   <joint name="left_front_wheel_joint" type="continuous">
     <parent link="left_front_steering"/>
     <child link="left_front_wheel"/>
-    <origin rpy="0 0 0" xyz="0 0 -0.055"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028"/>
     <axis xyz="0 1 0"/>
   </joint>
 
@@ -31,17 +33,18 @@
 
 <unit_create base_name="left_rear_steering" wheel_name="left_rear_wheel"/>
 
+
   <joint name="left_rear_steering_joint" type="continuous">
     <parent link="base_link"/>
     <child link="left_rear_steering"/>
-    <origin rpy="0 0 0" xyz="-0.35 0.35 -0.055"/>
+    <origin rpy="0 0 0" xyz="-0.265 0.265 0"/>
     <axis xyz="0 0 1"/>
   </joint>
 
   <joint name="left_rear_wheel_joint" type="continuous">
     <parent link="left_rear_steering"/>
     <child link="left_rear_wheel"/>
-    <origin rpy="0 0 0" xyz="0 0 -0.055"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028"/>
     <axis xyz="0 1 0"/>
   </joint>
 
@@ -51,14 +54,15 @@
   <joint name="right_front_steering_joint" type="continuous">
     <parent link="base_link"/>
     <child link="right_front_steering"/>
-    <origin rpy="0 0 0" xyz="0.35 -0.35 -0.055"/>
+    <origin rpy="0 0 0" xyz="-0.265 -0.265 0"/>
     <axis xyz="0 0 1"/>
   </joint>
+
 
   <joint name="right_front_wheel_joint" type="continuous">
     <parent link="right_front_steering"/>
     <child link="right_front_wheel"/>
-    <origin rpy="0 0 0" xyz="0 0 -0.055"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028"/>
     <axis xyz="0 1 0"/>
   </joint>
 
@@ -70,14 +74,14 @@
   <joint name="right_rear_steering_joint" type="continuous">
     <parent link="base_link"/>
     <child link="right_rear_steering"/>
-    <origin rpy="0 0 0" xyz="-0.35 -0.35 -0.055"/>
+    <origin rpy="0 0 0" xyz="0.265 -0.265 0"/>
     <axis xyz="0 0 1"/>
   </joint>
 
   <joint name="right_rear_wheel_joint" type="continuous">
     <parent link="right_rear_steering"/>
     <child link="right_rear_wheel"/>
-    <origin rpy="0 0 0" xyz="0 0 -0.055"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028"/>
     <axis xyz="0 1 0"/>
   </joint>
 
@@ -87,13 +91,13 @@
   <joint name="base_joint" type="fixed">
    <parent link="base_footprint"/>
    <child link="base_link"/>
-   <origin rpy="0 0 0" xyz="0 0 0.16"/>
+   <origin rpy="0 0 0" xyz="0 0 0.022"/>
 
  </joint>
 
 
-  <!-- Hokuyo Laser -->
-  <link name="left_hokuyo_link">
+
+ <link name="left_hokuyo_link">
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
@@ -112,13 +116,12 @@
   </link>
   <joint name="left_hokuyo_joint" type="fixed">
     <axis xyz="0 1 0" />
-    <origin xyz="0.4 0.4 0.1" rpy="0 0 ${M_PI/4}"/>
+    <origin xyz="0.4385 -0.4385 0.002" rpy="0 0 ${M_PI*3/4}"/>
     <parent link="base_link"/>
     <child link="left_hokuyo_link"/>
   </joint>
 
-  <!-- Hokuyo Laser -->
-  <link name="right_hokuyo_link">
+<link name="right_hokuyo_link">
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
@@ -132,15 +135,93 @@
         <mesh filename="package://rrbot_description/meshes/hokuyo.dae"/>
       </geometry>
     </visual>
-
-
   </link>
+
   <joint name="right_hokuyo_joint" type="fixed">
     <axis xyz="0 1 0" />
-    <origin xyz="-0.4 -0.4 0.1" rpy="0 0 ${-3*M_PI/4}"/>
+    <origin xyz="-0.4385 0.4385 0.002" rpy="0 0 ${-M_PI/4}"/>
     <parent link="base_link"/>
     <child link="right_hokuyo_link"/>
   </joint>
+
+<!--
+<link name="marker1">
+
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+    </visual>
+
+
+  </link>
+  <joint name="fix1" type="fixed">
+    <origin xyz="0 0 0.3" rpy="0 0 0"/>
+    <parent link="wheel1"/>
+    <child link="marker1"/>
+  </joint>
+
+<link name="marker2">
+
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+    </visual>
+
+
+  </link>
+  <joint name="fix2" type="fixed">
+    <origin xyz="0 0 0.3" rpy="0 0 0"/>
+    <parent link="wheel2"/>
+    <child link="marker2"/>
+  </joint>
+
+<link name="marker3">
+
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+    </visual>
+
+
+  </link>
+  <joint name="fix3" type="fixed">
+    <origin xyz="0 0 0.3" rpy="0 0 0"/>
+    <parent link="wheel3"/>
+    <child link="marker3"/>
+  </joint>
+
+<link name="marker4">
+
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+    </visual>
+
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+  <joint name="fix4" type="fixed">
+    <origin xyz="0 0 0.3" rpy="0 0 0"/>
+    <parent link="wheel4"/>
+    <child link="marker4"/>
+  </joint>-->
+
+
 
 
   <!-- ===============  Transmission ===============-->
@@ -153,7 +234,7 @@
 
 
 
-  <!-- =============== Gazebo =============== -->
+   <!-- =============== Gazebo =============== -->
   <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
       <robotNamespace>my_robo</robotNamespace>
@@ -297,5 +378,4 @@
       </plugin>
     </sensor>
   </gazebo>
-
 </robot>

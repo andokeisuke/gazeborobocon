@@ -6,9 +6,9 @@
 
  <node name="tf_twist" type="tf_twist" pkg="tf_twist" />
 
-
+<!--
 <include file="$(find ira_laser_tools)/launch/laserscan_multi_merger.launch"/>
-
+-->
 
 <node pkg="rviz" type="rviz" name="rviz">
 </node>
