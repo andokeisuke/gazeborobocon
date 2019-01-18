@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(tf_twist)
+project(joy_to_motorpw)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -9,10 +9,7 @@ project(tf_twist)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  rospy
   std_msgs
-  geometry_msgs
-  custom_msg
 )
 
 ## System dependencies are found with CMake's conventions
@@ -72,7 +69,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
-#   std_msgs
+#   std_msgs  # Or other packages containing msgs
 # )
 
 ################################################
@@ -106,8 +103,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES tf_twist
-#  CATKIN_DEPENDS roscpp rospy std_msgs
+#  LIBRARIES joy_to_motorpw
+#  CATKIN_DEPENDS roscpp
 #  DEPENDS system_lib
 )
 
@@ -118,13 +115,21 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+ include
   ${catkin_INCLUDE_DIRS}
 )
 
+
+add_executable(tc_joy src/tc_joy.cpp)
+target_link_libraries(tc_joy ${catkin_LIBRARIES})
+
+add_executable(cmd_vel_to_power src/cmd_vel_to_power.cpp)
+target_link_libraries(cmd_vel_to_power ${catkin_LIBRARIES})
+
+
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/tf_twist.cpp
+#   src/${PROJECT_NAME}/joy_to_motorpw.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -135,9 +140,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
- add_executable(tf_twist src/tf_twist.cpp)
-target_link_libraries(tf_twist ${catkin_LIBRARIES})
-
+# add_executable(${PROJECT_NAME}_node src/joy_to_motorpw_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -150,7 +153,9 @@ target_link_libraries(tf_twist ${catkin_LIBRARIES})
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-
+# target_link_libraries(${PROJECT_NAME}_node
+#   ${catkin_LIBRARIES}
+# )
 
 #############
 ## Install ##
@@ -192,7 +197,7 @@ target_link_libraries(tf_twist ${catkin_LIBRARIES})
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_tf_twist.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_joy_to_motorpw.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

@@ -18,7 +18,7 @@
   <joint name="left_front_steering_joint" type="continuous">
     <parent link="base_link"/>
     <child link="left_front_steering"/>
-    <origin rpy="0 0 0" xyz="0.265 0.265 0"/>
+    <origin rpy="0 0 ${3*M_PI/4}" xyz="0.265 0.265 0"/>
     <axis xyz="0 0 1"/>
   </joint>
 
@@ -37,7 +37,7 @@
   <joint name="left_rear_steering_joint" type="continuous">
     <parent link="base_link"/>
     <child link="left_rear_steering"/>
-    <origin rpy="0 0 0" xyz="-0.265 0.265 0"/>
+    <origin rpy="0 0 ${-3*M_PI/4}" xyz="-0.265 0.265 0"/>
     <axis xyz="0 0 1"/>
   </joint>
 
@@ -49,38 +49,38 @@
   </joint>
 
 
-<unit_create base_name="right_front_steering" wheel_name="right_front_wheel"/>
+<unit_create base_name="right_rear_steering" wheel_name="right_rear_wheel"/>
 
-  <joint name="right_front_steering_joint" type="continuous">
+  <joint name="right_rear_steering_joint" type="continuous">
     <parent link="base_link"/>
-    <child link="right_front_steering"/>
-    <origin rpy="0 0 0" xyz="-0.265 -0.265 0"/>
+    <child link="right_rear_steering"/>
+    <origin rpy="0 0 ${-M_PI/4}" xyz="-0.265 -0.265 0"/>
     <axis xyz="0 0 1"/>
   </joint>
 
 
-  <joint name="right_front_wheel_joint" type="continuous">
-    <parent link="right_front_steering"/>
-    <child link="right_front_wheel"/>
+  <joint name="right_rear_wheel_joint" type="continuous">
+    <parent link="right_rear_steering"/>
+    <child link="right_rear_wheel"/>
     <origin rpy="0 0 0" xyz="0 0 0.028"/>
     <axis xyz="0 1 0"/>
   </joint>
 
 
 
-<unit_create base_name="right_rear_steering" wheel_name="right_rear_wheel"/>
+<unit_create base_name="right_front_steering" wheel_name="right_front_wheel"/>
 
 
-  <joint name="right_rear_steering_joint" type="continuous">
+  <joint name="right_front_steering_joint" type="continuous">
     <parent link="base_link"/>
-    <child link="right_rear_steering"/>
-    <origin rpy="0 0 0" xyz="0.265 -0.265 0"/>
+    <child link="right_front_steering"/>
+    <origin rpy="0 0 ${M_PI/4}" xyz="0.265 -0.265 0"/>
     <axis xyz="0 0 1"/>
   </joint>
 
-  <joint name="right_rear_wheel_joint" type="continuous">
-    <parent link="right_rear_steering"/>
-    <child link="right_rear_wheel"/>
+  <joint name="right_front_wheel_joint" type="continuous">
+    <parent link="right_front_steering"/>
+    <child link="right_front_wheel"/>
     <origin rpy="0 0 0" xyz="0 0 0.028"/>
     <axis xyz="0 1 0"/>
   </joint>
@@ -116,7 +116,7 @@
   </link>
   <joint name="left_hokuyo_joint" type="fixed">
     <axis xyz="0 1 0" />
-    <origin xyz="0.4385 -0.4385 0.002" rpy="0 0 ${M_PI*3/4}"/>
+    <origin xyz="0.4385 0.4385 0.002" rpy="0 0 ${M_PI*3/4}"/>
     <parent link="base_link"/>
     <child link="left_hokuyo_link"/>
   </joint>
@@ -139,7 +139,7 @@
 
   <joint name="right_hokuyo_joint" type="fixed">
     <axis xyz="0 1 0" />
-    <origin xyz="-0.4385 0.4385 0.002" rpy="0 0 ${-M_PI/4}"/>
+    <origin xyz="-0.4385 -0.4385 0.002" rpy="0 0 ${-M_PI/4}"/>
     <parent link="base_link"/>
     <child link="right_hokuyo_link"/>
   </joint>
@@ -227,8 +227,8 @@
   <!-- ===============  Transmission ===============-->
  <trans_create base_joint_name="left_front_steering_joint" wheel_name="left_front_wheel"/>
 <trans_create base_joint_name="left_rear_steering_joint" wheel_name="left_rear_wheel"/>
-<trans_create base_joint_name="right_front_steering_joint" wheel_name="right_front_wheel"/>
 <trans_create base_joint_name="right_rear_steering_joint" wheel_name="right_rear_wheel"/>
+<trans_create base_joint_name="right_front_steering_joint" wheel_name="right_front_wheel"/>
 
 
 
@@ -277,19 +277,6 @@
     <mu2 value="${mu}" />
   </gazebo>
 
- <gazebo reference="right_front_steering">
-   <selfCollide>true</selfCollide>
-     <!-- This caster is no frictional resistance. -->
-    <mu1 value="${mu}" />
-    <mu2 value="${mu}" />
-  </gazebo>
-
-<gazebo reference="right_front_wheel">
-   <selfCollide>true</selfCollide>
-     <!-- This caster is no frictional resistance. -->
-    <mu1 value="${mu}" />
-    <mu2 value="${mu}" />
-</gazebo>
  <gazebo reference="right_rear_steering">
    <selfCollide>true</selfCollide>
      <!-- This caster is no frictional resistance. -->
@@ -298,6 +285,19 @@
   </gazebo>
 
 <gazebo reference="right_rear_wheel">
+   <selfCollide>true</selfCollide>
+     <!-- This caster is no frictional resistance. -->
+    <mu1 value="${mu}" />
+    <mu2 value="${mu}" />
+</gazebo>
+ <gazebo reference="right_front_steering">
+   <selfCollide>true</selfCollide>
+     <!-- This caster is no frictional resistance. -->
+    <mu1 value="${mu}" />
+    <mu2 value="${mu}" />
+  </gazebo>
+
+<gazebo reference="right_front_wheel">
    <selfCollide>true</selfCollide>
      <!-- This caster is no frictional resistance. -->
     <mu1 value="${mu}" />

@@ -1,0 +1,9 @@
+<launch>
+
+ <node name="tf_twist" type="tf_twist" pkg="tf_twist" />
+
+
+<include file="$(find control)/launch/joy_control.launch"/>
+
+</launch>
+
