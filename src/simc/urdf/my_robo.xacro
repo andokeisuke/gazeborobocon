@@ -335,7 +335,7 @@
         </noise>
       </ray>
       <plugin name="gazebo_ros_left_hokuyo_controller" filename="libgazebo_ros_laser.so">
-        <topicName>/rrbot/laser/left_scan</topicName>
+        <topicName>laser/left_scan</topicName>
         <frameName>left_hokuyo_link</frameName>
       </plugin>
     </sensor>
@@ -373,7 +373,7 @@
         </noise>
       </ray>
       <plugin name="gazebo_ros_right_hokuyo_controller" filename="libgazebo_ros_laser.so">
-        <topicName>/rrbot/laser/right_scan</topicName>
+        <topicName>laser/right_scan</topicName>
         <frameName>right_hokuyo_link</frameName>
       </plugin>
     </sensor>
