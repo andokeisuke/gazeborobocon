@@ -5,6 +5,10 @@
 
 <include file="$(find control)/launch/joy_control.launch"/>
 
+ <node name="gerege_stepping_pub" type="gerege_stepping_pub" pkg="gerege_stepping" output="screen" />
+
+
+<!--
 <node
  pkg="rosserial_python"
  type="serial_node.py"
@@ -13,7 +17,7 @@
 <param name="port" value="/dev/ttyACM0"/>
 <param name="baud" value="57600"/>
 </node>
-
+-->
 
 </launch>
 
