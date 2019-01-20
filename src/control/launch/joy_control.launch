@@ -1,0 +1,12 @@
+<launch>
+<!--joy node-->
+<node pkg="joy" type="joy_node" name="joy_node">
+</node>
+
+<!--tc_joy-->
+<node pkg="control" type="control" name="control_node">
+</node>
+
+
+</launch>
+
