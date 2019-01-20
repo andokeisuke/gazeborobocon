@@ -123,7 +123,7 @@ void initServos() {
   for(i = 0; i < servoSum; i++) {
     servos[i] = Servo();
 //    servos[i].attach(i+2);  //pin: 2~14
-    servos[i].write(close_angle);
+//    servos[i].write(close_angle);
   }
 }
 

@@ -1,10 +1,10 @@
-#include"ros/ros.h"
-#include"std_msgs/Int8.h"
-#include"std_msgs/Int16.h"
-#include"std_msgs/Float64.h"
-#include"std_msgs/Bool.h"
-#include<gerege_stepping/gerege_stepping_msg.h>
-#include<sstream>
+#include "ros/ros.h"
+#include "std_msgs/Int8.h"
+#include "std_msgs/Int16.h"
+#include "std_msgs/Float64.h"
+#include "std_msgs/Bool.h"
+#include <gerege_stepping/gerege_stepping_msg.h>
+#include <sstream>
 
 int PIN = 9; //PIN番号   ←なんのピン？
 int CW = 10; //CW番号    ←CWのピン番号？
