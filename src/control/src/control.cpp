@@ -150,24 +150,31 @@ int main(int argc, char** argv)
 			switch (servo_count)
 			{
 				case 0:
-					servo_task.data = SERVO_GEREGE_PASS;
+					servo_task.data = SERVO_PREPARE;
 					servo_task_pub.publish(servo_task);		
-					servo_state = SERVO_GEREGE_PASS;
+					servo_state = SERVO_PREPARE;
 					servo_count = 1;
 					break;
 
 				case 1:	
-					servo_task.data = SERVO_SHAGAI_GET;
+					servo_task.data = SERVO_GEREGE_PASS;
 					servo_task_pub.publish(servo_task);		
-					servo_state = SERVO_SHAGAI_GET;
+					servo_state = SERVO_GEREGE_PASS;
 					servo_count = 2;
 					break;
 
 				case 2:	
+					servo_task.data = SERVO_SHAGAI_GET;
+					servo_task_pub.publish(servo_task);		
+					servo_state = SERVO_SHAGAI_GET;
+					servo_count = 3;
+					break;
+
+				case 3:	
 					servo_task.data = SERVO_SHAGAI_SHOOT;
 					servo_task_pub.publish(servo_task);		
 					servo_state = SERVO_SHAGAI_SHOOT;
-					servo_count = 1;
+					servo_count = 2;
 					break;
 
 

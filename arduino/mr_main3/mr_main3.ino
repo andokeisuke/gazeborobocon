@@ -42,7 +42,7 @@ IseMotorDriver left_front = IseMotorDriver(0x0);
 IseMotorDriver left_rear = IseMotorDriver(0x0);
 IseMotorDriver right_front_st = IseMotorDriver(0x0);
 IseMotorDriver right_rear_st = IseMotorDriver(0x0);
-IseMotorDriver left_front_st = IseMotorDriver(0x33);
+IseMotorDriver left_front_st = IseMotorDriver(0x00);
 IseMotorDriver left_rear_st = IseMotorDriver(0x0);                                                             
 
 MotorHandler right_front_handler;
@@ -69,7 +69,15 @@ void servoDegCB(const std_msgs::Int16MultiArray& array)
 {
   int index = array.data[0];
   int deg = array.data[1];
-  servos[index].write(deg);
+  if(index == -1)
+  {
+    servo_detach();
+  }
+  else
+  {    
+    servos[index].attach(index+7);  //pin: 2~14
+    servos[index].write(deg);
+  }
 }
 
 ros::Subscriber<std_msgs::Int16MultiArray>servo_sub("servo_deg",&servoDegCB);
@@ -103,10 +111,29 @@ ros::Subscriber<custom_msg::wh_msg>left_rear_sub("left_rear",wh_cb_lrear);
 
 // ==================== functions ==================== //
 
-int vel_time = 0;
+void initServos() {
 
+
+  int i = 0;
+  for(i = 0; i < servoSum; i++) {
+    servos[i] = Servo();
+    servos[i].attach(i+7);  //pin: 2~14
+    servos[i].write(close_angle);
+    delay(1000);
+    servos[i].detach();
+  }
+}
+
+void servo_detach()
+{
+  int i = 0;
+  for(i = 0; i < servoSum; i++) {
+    servos[i].detach();
+  }  
+}
 
 void setup() {
+  nh.getHardware()->setBaud(57600);
   Wire.begin();
   nh.initNode();
   initServos();
@@ -116,15 +143,23 @@ void setup() {
   nh.subscribe(left_front_sub);
   nh.subscribe(left_rear_sub);
   nh.subscribe(servo_sub);
-}
 
-void initServos() {
-  int i = 0;
-  for(i = 0; i < servoSum; i++) {
-    servos[i] = Servo();
-//    servos[i].attach(i+2);  //pin: 2~14
-//    servos[i].write(close_angle);
-  }
+/*
+   servos[0].write(open_angle);
+   servos[3].write(open_angle);
+   delay(1000);
+
+   servos[4].write(open_angle);
+   delay(1000);
+
+   servos[4].write(close_angle);
+   delay(1000);
+
+   servos[4].write(close_angle);
+   servos[5].write(open_angle);
+   delay(1000);
+*/
+
 }
 
 void loop() {
@@ -141,5 +176,6 @@ void loop() {
   left_rear_st.setSpeed(left_rear_st_handler.target_vel);
  delay(5);
   nh.spinOnce();
+  
   
 }

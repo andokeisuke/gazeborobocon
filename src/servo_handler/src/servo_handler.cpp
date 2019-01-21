@@ -19,7 +19,7 @@ const int servoSum = 7;
 const int closeDeg = 0; // close deg
 const int openDeg = 90;   // open deg
 const int hz = 10;
-const int a = 0, b = 1, c = 2, d = 3, e = 4, f = 5, g = 6;
+const int a = 0, b = 6, c = 5, d = 4, e = 3, f = 2, g = 1,servo_detach_flag = -1;
 const int delaySmall = 1000, delayMedium = 3000, delayLong = 1500, delayShot = 1000, delayReset = 3000, delay2000 = 2000;
 
 // inner values
@@ -67,6 +67,7 @@ void delayCount() {
     if(final_delay == true)
     {
       state = SERVO_WAIT;
+      sendArr(servo_detach_flag,0);  
       servop.data=state;
       servoPub.publish(servop);
       final_delay = false;
@@ -92,27 +93,27 @@ void setup() {
 
 void prepare() {
   // ready for shooting shygai
-  static int mode = -1;
-   if(mode==-1){
+  static int mode = 0;
+   if(mode==0){
     ROS_INFO("prepare");
     sOpen(e);
     sOpen(a);
     delay(delaySmall);
-    mode = 0;
-  } else if (mode == 0) {
-    sOpen(d);
-    delay(delaySmall);
     mode = 1;
   } else if (mode == 1) {
-    sClose(d);
+    sOpen(d);
     delay(delaySmall);
     mode = 2;
   } else if (mode == 2) {
+    sClose(d);
+    delay(delaySmall);
+    mode = 3;
+  } else if (mode == 3) {
     sOpen(c);
     sClose(d);
     delay(delaySmall);
     final_delay = true;
-    mode = -1;
+    mode = 0;
   } 
   
 }
@@ -226,9 +227,7 @@ int main(int argc, char **argv)
   servoPub = n.advertise<std_msgs::Int8>("servo_task", 1);
   servoSub = n.subscribe("servo_task", 1, servoTaskCallback);
   ros::Rate loop_rate(hz);
-  setup();
-  prepare();
-  
+    
   while (ros::ok())
     {
       ros::spinOnce();
