@@ -8,7 +8,6 @@
 
 ros::NodeHandle nh;
 gerege_stepping::gerege_stepping_msg msg;   
-ros::Publisher pub("stepping_var",&msg);
 
 int pin; //ピン番号
 int cw;  //CW
@@ -35,7 +34,7 @@ void messageCallback(const gerege_stepping::gerege_stepping_msg& msg){
     FlexiTimer2::stop();
     check = !dir;
   
-    pub.publish(&msg);
+//    pub.publish(&msg);
   }
 }
 
@@ -49,7 +48,6 @@ ros::Subscriber<gerege_stepping::gerege_stepping_msg> sub("stepping_var", messag
 
 void setup(){
   nh.initNode();
-  nh.advertise(pub);
   nh.subscribe(sub); 
 
   check=dir;

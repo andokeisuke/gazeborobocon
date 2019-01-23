@@ -15,9 +15,9 @@
 #define  SERVO_CLOSE  6
 
 // params
-const int servoSum = 7;
+const int servoSum = 7;                                           
 const int closeDeg = 0; // close deg
-const int openDeg = 90;   // open deg
+const int openDeg = 105;   // open deg
 const int hz = 10;
 const int a = 0, b = 6, c = 5, d = 4, e = 3, f = 2, g = 1,servo_detach_flag = -1;
 const int delaySmall = 1000, delayMedium = 3000, delayLong = 1500, delayShot = 1000, delayReset = 3000, delay2000 = 2000;
@@ -110,7 +110,7 @@ void prepare() {
     mode = 3;
   } else if (mode == 3) {
     sOpen(c);
-    sClose(d);
+    sClose(a);
     delay(delaySmall);
     final_delay = true;
     mode = 0;
@@ -175,7 +175,7 @@ void Shagai_shoot() {
     mode = 5;
   } else if (mode == 5) {
     sOpen(c);
-    sClose(d);
+    sClose(a);
     delay(delaySmall);
     final_delay = true;
     mode = 0;
@@ -183,16 +183,32 @@ void Shagai_shoot() {
 }
 
 void all_close(){
-	int dc = delaySmall;
-	sClose(a);
-	sClose(b);
-	sClose(c);
-	sClose(d);
-	sClose(e);
-	sClose(f);
-	sClose(g);
-  delay(delaySmall);
-  final_delay = true;
+    static int mode = 0;
+    if (mode == 0) {
+      ROS_INFO("all_close");
+      //flagup
+      sClose(a);
+      sClose(b);
+      delay(delaySmall);
+      mode = 1;
+    } else if (mode ==1) {
+      // shot done
+      sClose(c);
+      sClose(d);
+      delay(delaySmall);
+      mode = 2;
+    } else if (mode == 2) {
+      // prepare exhaust
+      sClose(e);
+      sClose(f);
+      delay(delaySmall);
+      mode = 3;
+    } else if (mode == 3) {
+    sClose(g);
+    delay(delaySmall);
+    final_delay = true;
+    mode = 0;
+  }
 }
 
 void task() {

@@ -6,11 +6,11 @@
 #include <gerege_stepping/gerege_stepping_msg.h>
 #include <sstream>
 
-int PIN = 9; //PIN番号   ←なんのピン？
-int CW = 10; //CW番号    ←CWのピン番号？
+int PIN = 7; //PIN番号   ←なんのピン？
+int CW = 6; //CW番号    ←CWのピン番号？
 float PW = 1.5; //パルス幅
 bool DIR = true; //回転方向
-int TIM = 50; //動かす時間
+int TIM = 6000; //動かす時間
 
 int Cylinder_state = 0;
 
@@ -56,12 +56,12 @@ int main(int argc,char **argv){
 		else if(Cylinder_state == 1)
 		{
 			msg.dir = true;
-			msg.tim = 50;
+			msg.tim = TIM;
 		}
 		else if(Cylinder_state == -1)
 		{
 			msg.dir = false;
-			msg.tim = 50;
+			msg.tim = TIM;
 		}
 
 		pub.publish(msg); //publish msg

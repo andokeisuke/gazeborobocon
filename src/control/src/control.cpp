@@ -2,6 +2,8 @@
 #include <sensor_msgs/Joy.h>
 #include <std_msgs/Int8.h>
 #include <std_msgs/Int16.h>
+#include <std_msgs/Bool.h>
+
 #include <geometry_msgs/Twist.h>
 
 
@@ -36,7 +38,7 @@ public:
 	float gerege_push;
 	float gerege_pull;
 	float air_servo;
-
+	float vacuum_motor;
 };
 
 Joystick Joystick;
@@ -56,6 +58,7 @@ void joy_Callback(const sensor_msgs::Joy& joy){
 
   Joystick.air_servo = joy.buttons[3];//右の4番 
 
+  Joystick.vacuum_motor = joy.buttons[0];//右の1番 
 }
 
 
@@ -74,6 +77,7 @@ int main(int argc, char** argv)
 {
 	int servo_count = 0;
 	float pre_servo_button_state = 0;
+	float pre_vacuum_button_state = 0;
 
 	ros::init(argc, argv, "joy");
 	ros::NodeHandle n;
@@ -81,10 +85,11 @@ int main(int argc, char** argv)
 	ros::Subscriber joy_sub = n.subscribe("joy", 1, joy_Callback);
 	ros::Subscriber servo_sub = n.subscribe("servo_task", 1, servoTaskCallback);
 
-
 	ros::Publisher twist_pub = n.advertise<geometry_msgs::Twist>("sub",1);
 	ros::Publisher arm_deg_pub = n.advertise<std_msgs::Int16>("tar_arm_deg",1);
 	ros::Publisher gerege_cylinder_pub = n.advertise<std_msgs::Int16>("gerege_cylinder",1);
+	ros::Publisher vacuum_motor_pub = n.advertise<std_msgs::Bool>("vacuum_motor_state",1);
+
 	servo_task_pub = n.advertise<std_msgs::Int8>("servo_task",1);
 
 
@@ -94,11 +99,13 @@ int main(int argc, char** argv)
 	std_msgs::Int16 deg;
 	std_msgs::Int16 gerege_cylinder;
 	std_msgs::Int8 servo_task;
+	std_msgs::Bool vacuum_task;
+
 
 	while(n.ok()){
 
 		ros::spinOnce();
-
+		ROS_INFO("o");
 		geometry_msgs::Twist twist;
   //  int temp_deg = 0;
 
@@ -113,8 +120,7 @@ int main(int argc, char** argv)
 		{
 			twist.angular.z = MIN_ANGULAR_VEL;
 		}    
-
-
+		
 		if(Joystick.arm_up == 0 &&Joystick.arm_down == 0)
 		{
 			deg.data = 0;
@@ -137,11 +143,18 @@ int main(int argc, char** argv)
 		else if(Joystick.gerege_push == 1)
 		{
 			gerege_cylinder.data = 1;
-		}    
+			servo_task.data = SERVO_CLOSE;
+			servo_task_pub.publish(servo_task);		
+			servo_state = SERVO_CLOSE;
 
+		}    
 		else if(Joystick.gerege_pull == 1)
 		{
 			gerege_cylinder.data = -1;
+			servo_task.data = SERVO_CLOSE;
+			servo_task_pub.publish(servo_task);		
+			servo_state = SERVO_CLOSE;
+
 		}    
 
 
@@ -150,17 +163,33 @@ int main(int argc, char** argv)
 			switch (servo_count)
 			{
 				case 0:
+				
 					servo_task.data = SERVO_PREPARE;
 					servo_task_pub.publish(servo_task);		
 					servo_state = SERVO_PREPARE;
 					servo_count = 1;
 					break;
+				
+/*
+					servo_task.data = SERVO_SHAGAI_SHOOT;
+					servo_task_pub.publish(servo_task);		
+					servo_state = SERVO_SHAGAI_SHOOT;
+					servo_count = 0;
+					break;
+*/
 
 				case 1:	
+/*
 					servo_task.data = SERVO_GEREGE_PASS;
 					servo_task_pub.publish(servo_task);		
 					servo_state = SERVO_GEREGE_PASS;
 					servo_count = 2;
+					break;
+*/
+					servo_task.data = SERVO_SHAGAI_SHOOT;
+					servo_task_pub.publish(servo_task);		
+					servo_state = SERVO_SHAGAI_SHOOT;
+					servo_count = 1;
 					break;
 
 				case 2:	
@@ -180,8 +209,20 @@ int main(int argc, char** argv)
 
 			}
 
-
 		}
+
+		if(pre_vacuum_button_state && Joystick.vacuum_motor == 0)
+		{
+			
+			vacuum_task.data = !vacuum_task.data;
+			vacuum_motor_pub.publish(vacuum_task);
+			/*
+			servo_task.data = SERVO_CLOSE;
+			servo_task_pub.publish(servo_task);		
+			servo_state = SERVO_CLOSE;
+			*/
+		}    
+
 
 		arm_deg_pub.publish(deg);
 
@@ -190,6 +231,7 @@ int main(int argc, char** argv)
 		gerege_cylinder_pub.publish(gerege_cylinder);
 
 		pre_servo_button_state = Joystick.air_servo;
+		pre_vacuum_button_state= Joystick.vacuum_motor;
 		r.sleep();
 
 //		ROS_INFO("servo_state = %d",servo_state);

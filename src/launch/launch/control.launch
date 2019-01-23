@@ -2,22 +2,32 @@
 
  <node name="tf_twist" type="tf_twist" pkg="tf_twist" />
 
-
 <include file="$(find control)/launch/joy_control.launch"/>
 
 <!--
  <node name="gerege_stepping_pub" type="gerege_stepping_pub" pkg="gerege_stepping" output="screen" />
 -->
 
- <node name="servo_handler" type="servo_handler" pkg="servo_handler"  output="screen"
-/>
-
+<!--
+ <node name="servo_handler" type="servo_handler" pkg="servo_handler"  />
+-->
 
 <!--
 <node
  pkg="rosserial_python"
  type="serial_node.py"
- name="serial_node"
+ name="serial_node_arm"
+ output="screen"
+>
+
+<param name="port" value="/dev/ttyACM1"/>
+<param name="baud" value="57600"/>
+</node>
+
+<node
+ pkg="rosserial_python"
+ type="serial_node.py"
+ name="serial_node_main"
  output="screen"
 >
 
@@ -25,5 +35,6 @@
 <param name="baud" value="57600"/>
 </node>
 -->
+
 </launch>
 

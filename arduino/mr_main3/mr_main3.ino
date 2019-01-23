@@ -164,7 +164,7 @@ void setup() {
 
 void loop() {
   
-
+/*
   right_front.setSpeed(right_front_handler.target_vel);
   right_rear.setSpeed(right_rear_handler.target_vel);
   left_front.setSpeed(left_front_handler.target_vel);
@@ -174,6 +174,7 @@ void loop() {
   right_rear_st.setSpeed(right_rear_st_handler.target_vel);
   left_front_st.setSpeed(left_front_st_handler.target_vel);
   left_rear_st.setSpeed(left_rear_st_handler.target_vel);
+  */
  delay(5);
   nh.spinOnce();
   

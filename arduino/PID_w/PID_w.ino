@@ -38,18 +38,18 @@ void setup() {
   
   Wire.begin();
   Serial.begin(9600);
-  nh.initNode();
+  /*nh.initNode();
   nh.advertise(pub);
   nh.subscribe(sub);
 
   preTime=micros()/1000000;
-  preenc = m1.encorder();
+  preenc = m1.encorder();*/
 }
 
 void loop() {
     
     enc = m1.encorder();
-    P = targetenc - (enc-preenc);
+    /*P = targetenc - (enc-preenc);
     if(P>320)duty=20;
     else if(P<-320)duty=-20;
     else if(P<20&&P>-20)duty=0;
@@ -74,5 +74,8 @@ void loop() {
     // Serial.println(enc);
      //Serial.println(P);
      //Serial.println(duty);
-     nh.spinOnce();
+     nh.spinOnce();*/
+     
+    Serial.println(enc);
+     delay(10);
 }
