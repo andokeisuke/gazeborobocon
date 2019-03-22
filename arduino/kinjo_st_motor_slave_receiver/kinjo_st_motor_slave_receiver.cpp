@@ -30,7 +30,7 @@ int KinjoStMotorSlave::receive()
 void KinjoStMotorSlave::rotate() {
   int s = 0;
   int send_step = 0;
-  Serial.println(tar_degree);
+  //Serial.println(tar_degree);
   this->pre_degree = this->degree;
   this->degree = this->tar_degree;
   if (this->degree != this->pre_degree) 

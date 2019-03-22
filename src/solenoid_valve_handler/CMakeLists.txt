@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(custom_msg)
+project(solenoid_valve_handler)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -9,10 +9,7 @@ project(custom_msg)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  rospy
-  std_msgs
-  geometry_msgs
-  message_generation
+  custom_msg
 )
 
 ## System dependencies are found with CMake's conventions
@@ -49,15 +46,11 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
- add_message_files(
-   FILES
-   Nineaxis_sensor.msg
-   RL.msg
-   temp_odom.msg
-   wh_msg.msg
-   valve_msg.msg
-
- )
+# add_message_files(
+#   FILES
+#   Message1.msg
+#   Message2.msg
+# )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -74,11 +67,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
- generate_messages(
-   DEPENDENCIES
-   std_msgs  # Or other packages containing msgs
-   geometry_msgs
- )
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs  # Or other packages containing msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -111,8 +103,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES custom_msg
-  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime geometry_msgs
+#  LIBRARIES solenoid_valve_handler
+#  CATKIN_DEPENDS roscpp
 #  DEPENDS system_lib
 )
 
@@ -129,7 +121,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/custom_msg.cpp
+#   src/${PROJECT_NAME}/solenoid_valve_handler.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -140,7 +132,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/custom_msg_node.cpp)
+ add_executable(valve_handler src/valve_handler.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -153,9 +145,9 @@ include_directories(
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
-# )
+ target_link_libraries(valve_handler
+   ${catkin_LIBRARIES}
+ )
 
 #############
 ## Install ##
@@ -197,7 +189,7 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_custom_msg.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_solenoid_valve_handler.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

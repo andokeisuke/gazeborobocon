@@ -1,59 +1,56 @@
 #include "ros/ros.h"
 #include <stdlib.h>
 #include <math.h>
-#include "std_msgs/Int8.h"
-#include "std_msgs/MultiArrayLayout.h"
-#include "std_msgs/MultiArrayDimension.h"
-#include "std_msgs/Int16MultiArray.h"
+
+#include <custom_msg/valve_msg.h>
+#include <std_msgs/Int8.h>
+
 //#include "conf.h"
-#define  SERVO_WAIT  1
-#define  SERVO_PREPARE  2
-#define  SERVO_GEREGE_PASS  3
-#define  SERVO_SHAGAI_GET  4
-#define  SERVO_SHAGAI_SHOOT  5
-#define  SERVO_CLOSE  6
+#define  VALVE_WAIT  1
+#define  VALVE_PREPARE  2
+#define  VALVE_GEREGE_PASS  3
+#define  VALVE_SHAGAI_GET  4
+#define  VALVE_SHAGAI_SHOOT  5
+#define  VALVE_CLOSE  6
 
 // params
 const int servoSum = 7;                                           
-const int closeDeg = 0; // close deg
-const int openDeg = 105;   // open deg
 const int hz = 10;
-const int a = 0, b = 6, c = 5, d = 4, e = 3, f = 2, g = 1,servo_detach_flag = -1;
+const int a = 0, b = 6, c = 5, d = 4, e = 3, f = 2, g = 1,valve_detach_flag = -1;//pin_name
 const int delaySmall = 1000, delayMedium = 3000, delayLong = 1500, delayShot = 1000, delayReset = 3000, delay2000 = 2000;
 
 // inner values
 bool delaying = false; // for delay
 bool final_delay = false;
 int delayCounter = 0;
-int state = SERVO_WAIT;
+int state = VALVE_WAIT;
 
 // ros values
-ros::Publisher pub;
-ros::Publisher servoPub;
-ros::Subscriber servoSub;
-std_msgs::Int16MultiArray array;
-std_msgs::Int8 servop;
+ros::Publisher valvePub;
+
+ros::Subscriber valveSub;
+
+custom_msg::valve_msg valve_op;
 
 // =========== callback ==========
-void servoTaskCallback(const std_msgs::Int8::ConstPtr& m){
+void valveTaskCallback(const std_msgs::Int8::ConstPtr& m){
   //ROS_INFO("stcb");
   state = m->data;
 }
 
 // ===========sub func==========
-void sendArr(int servoNo, int degree) {
-  array.data.clear();
-  array.data.push_back(servoNo);
-  array.data.push_back(degree);
-  pub.publish(array);
+void sendValve_op(bool state, int number) {
+  valve_op.state = state;
+  valve_op.valve_number = number;
+  valvePub.publish(valve_op);
 }
 
-void sOpen(int servoNo) {
-  sendArr(servoNo, openDeg);  
+void sOpen(int valveNo) {
+  sendValve_op(valveNo, true);  
 }
 
-void sClose(int servoNo) {
-  sendArr(servoNo, closeDeg);  
+void sClose(int valveNo) {
+  sendValve_op(valveNo, false);  
 }
 
 void delayCount() {
@@ -64,10 +61,8 @@ void delayCount() {
 
     if(final_delay == true)
     {
-      state = SERVO_WAIT;
-      sendArr(servo_detach_flag,0);  
-      servop.data=state;
-      servoPub.publish(servop);
+      state = VALVE_WAIT;
+      sendValve_op(-1,false);  
       final_delay = false;
     }
 
@@ -211,22 +206,22 @@ void all_close(){
 
 void task() {
   //  ROS_INFO("task");
-  if (state == SERVO_WAIT) {
+  if (state == VALVE_WAIT) {
 	ROS_INFO("Wait\n");
     //pass
-  } else if (state == SERVO_PREPARE) {
+  } else if (state == VALVE_PREPARE) {
     ROS_INFO("prepare\n");
     prepare();
-  } else if (state == SERVO_GEREGE_PASS) {
+  } else if (state == VALVE_GEREGE_PASS) {
   ROS_INFO("Pass Gerege\n");
     Grege_pass();
-  } else if (state == SERVO_SHAGAI_GET) {
+  } else if (state == VALVE_SHAGAI_GET) {
   ROS_INFO("Get Shagai\n");
     Shagai_get();
-  } else if (state == SERVO_SHAGAI_SHOOT) {
+  } else if (state == VALVE_SHAGAI_SHOOT) {
   ROS_INFO("Shoot Shagai\n");
     Shagai_shoot();
-  } else if (state == SERVO_CLOSE) {
+  } else if (state == VALVE_CLOSE) {
   ROS_INFO("close\n");
     all_close();
   }
@@ -235,11 +230,13 @@ void task() {
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "servo_handler");
+  ros::init(argc, argv, "valve_handler");
   ros::NodeHandle n; 
-  pub = n.advertise<std_msgs::Int16MultiArray>("servo_deg", 1);
-  servoPub = n.advertise<std_msgs::Int8>("servo_task", 1);
-  servoSub = n.subscribe("servo_task", 1, servoTaskCallback);
+
+  valvePub = n.advertise<custom_msg::valve_msg>("valve_op", 1);
+
+  valveSub = n.subscribe("valve_task", 1, valveTaskCallback);
+
   ros::Rate loop_rate(hz);
     
   while (ros::ok())

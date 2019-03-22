@@ -1,26 +1,74 @@
 #include "ros/ros.h"
-#include "std_msgs/Int8.h"
 #include "std_msgs/Int16.h"
-#include "std_msgs/Float64.h"
 #include "std_msgs/Bool.h"
-#include <gerege_stepping/gerege_stepping_msg.h>
-#include <sstream>
 
-int PIN = 7; //PIN番号   ←なんのピン？
-int CW = 6; //CW番号    ←CWのピン番号？
-float PW = 1.5; //パルス幅
-bool DIR = true; //回転方向
-int TIM = 6000; //動かす時間
+const int hz = 10;
+const int delaySmall = 1000;
 
-int Cylinder_state = 0;
+bool gerege_pass_state = false;
 
-void Cylinder_Callback(const std_msgs::Int16 & cylinder){
+// inner values
+bool delaying = false; // for delay
+int delayCounter = 0;
 
-  Cylinder_state = cylinder.data;//左のスティック左右
-//  ROS_INFO(" o: [%d]",Cylinder_state);
+ros::Subscriber gerege_state_sub;
+ros::Publisher deg_pub;
+ros::Publisher gerege_state_pub;
 
+std_msgs::Int16 deg; 
+std_msgs::Bool state; 
+
+
+void delayCount() {
+  if (delayCounter > 0) {
+    delayCounter--;
+  } else {
+    delaying = false;
+    state.data = false;
+    gerege_state_pub.publish(state);
+  }
 }
 
+void delay(int ms) {
+  ROS_INFO("delay");
+  delayCounter = (ms*hz/1000);
+  delaying = true;  
+}
+
+
+void Gerege_pass_Callback(const std_msgs::Bool &state){
+  gerege_pass_state = state.data;//左のスティック左右
+//  ROS_INFO(" o: [%d]",Cylinder_state);
+}
+
+void Gerege_pass(){
+    static int mode = 0;
+    if (mode == 0) {
+      //ROS_INFO("Gerege_pass");
+      // shot
+      deg.data = 90;
+      deg_pub.publish(deg); //publish msg
+      delay(delaySmall);
+      mode = 1;
+    } else if (mode ==1) {
+      // shot done
+      deg.data = 0;
+      deg_pub.publish(deg); //publish msg
+      delay(delaySmall);
+      mode = 0;
+    } 
+}
+
+void task() {
+  //  ROS_INFO("task");
+  if (gerege_pass_state == false) {
+	ROS_INFO("Wait\n");
+    //pass
+  } else if (gerege_pass_state == true) {
+    ROS_INFO("gerege_pass\n");
+    Gerege_pass();
+  }
+}
 
 int main(int argc,char **argv){
 	
@@ -30,44 +78,24 @@ int main(int argc,char **argv){
 
 	//publisher name "pub", select message type "gerege_stepping_msg", topic name "stepping_var"
 
-	ros::Subscriber gerege_sub = nh.subscribe("gerege_cylinder", 1, Cylinder_Callback);
-	ros::Publisher pub = nh.advertise <gerege_stepping::gerege_stepping_msg>("stepping_var",1);
+	gerege_state_sub = nh.subscribe("gerege_pass_state", 1,Gerege_pass_Callback);
 
-	ros::Rate loop_rate(10); //loop 10Hz
+	gerege_state_pub = nh.advertise <std_msgs::Bool>("gerege_pass_state", 1);
+	deg_pub = nh.advertise <std_msgs::Int16>("gerege_stepping_deg",1);
+
+	ros::Rate loop_rate(hz); //loop 10Hz
 
 		//message name is "msg"
-		gerege_stepping::gerege_stepping_msg msg; 
+  while (ros::ok())
+    {
+      ros::spinOnce();
+      if (delaying) {
+	delayCount();
+      } else {
+	task();
+      }
+      loop_rate.sleep();
+    }
 
-		//var
-		msg.pin = PIN;
-		msg.cw = CW;
-		msg.pw = PW;
-		msg.dir = DIR;
-		msg.tim = TIM;
-
-
-	while(ros::ok()){
-		ros::spinOnce();
-
-		if(Cylinder_state == 0)
-		{
-			msg.tim = 0;
-		}
-		else if(Cylinder_state == 1)
-		{
-			msg.dir = true;
-			msg.tim = TIM;
-		}
-		else if(Cylinder_state == -1)
-		{
-			msg.dir = false;
-			msg.tim = TIM;
-		}
-
-		pub.publish(msg); //publish msg
-
-
-		loop_rate.sleep();
-	}
-	return 0;
+  return 0;
 }

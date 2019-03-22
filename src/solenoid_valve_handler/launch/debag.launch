@@ -1,0 +1,13 @@
+<launch>
+
+ <node name="servo_handler" type="servo_handler" pkg="servo_handler" output="screen" />
+
+ <node name="control" type="control" pkg="control" output="screen"/>
+
+<!--joy node-->
+<node pkg="joy" type="joy_node" name="joy_node">
+</node>
+
+
+</launch>
+
