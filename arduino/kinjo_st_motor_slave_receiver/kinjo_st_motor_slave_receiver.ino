@@ -18,6 +18,8 @@ void receiveEvent(int howMany)
 void setup() {
   Serial.begin(9600);           // start serial for output
   Wire.onReceive(receiveEvent);
+  slave.rotation_state = false;
+  slave.degree = 0;
 }
 
 

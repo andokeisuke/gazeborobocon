@@ -12,7 +12,6 @@
 KinjoStMotorSlave::KinjoStMotorSlave(uint8_t i2caddr,float dps,int rs) 
 :ti2c(i2caddr)
 ,stepper( (int) (360/dps), 8, 9, 10, 11) // create an instance of the stepper class, specifying
-,degree(0)
 {
   // @param uint8_t i2caddr: i2c addr of motor driver
   //initializer
@@ -31,6 +30,7 @@ int KinjoStMotorSlave::receive()
 void KinjoStMotorSlave::rotate() {
   int s = 0;
   int send_step = 0;
+  Serial.println(tar_degree);
   this->pre_degree = this->degree;
   this->degree = this->tar_degree;
   if (this->degree != this->pre_degree) 

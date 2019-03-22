@@ -12,11 +12,12 @@ class KinjoStMotorSlave {
     long encorder();
     float degree_per_step;
     bool rotation_state;
+    int degree;
+
   private:
     uint8_t addr;
     Ti2c ti2c;
     Stepper stepper;
-    int degree;
     int pre_degree;
     int tar_degree;
 };
