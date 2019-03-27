@@ -136,7 +136,7 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/gerege_stepping_node.cpp)
-add_executable(gerege_stepping_pub src/gerege_stepping_pub.cpp)
+add_executable(gerege_stepping src/gerege_stepping_pub.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -150,7 +150,7 @@ add_executable(gerege_stepping_pub src/gerege_stepping_pub.cpp)
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
-target_link_libraries(gerege_stepping_pub ${catkin_LIBRARIES})
+target_link_libraries(gerege_stepping ${catkin_LIBRARIES})
 #   ${catkin_LIBRARIES}
 # )
 

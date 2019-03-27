@@ -3,15 +3,10 @@
 #include <stdlib.h>
 
 #include <Wire.h>
-#include <Servo.h>
 
 #include <ros.h>
 #include <custom_msg/wh_msg.h>
-#include <std_msgs/Int8.h>
-#include <std_msgs/Int16.h>
-#include <std_msgs/Int16MultiArray.h>
-#include <std_msgs/MultiArrayLayout.h>
-#include <std_msgs/MultiArrayDimension.h>
+
 
 #include "ti2c.h"
 #include "ise_motor_driver.h"
@@ -28,10 +23,6 @@ struct MotorHandler
   double target_vel;
 
 };
-
-const int servoSum = 7;
-const int close_angle = 0;
-const int open_angle = 90;
 
 
 // ============================== arguments ==============================
@@ -54,9 +45,6 @@ MotorHandler right_rear_st_handler;
 MotorHandler left_front_st_handler;
 MotorHandler left_rear_st_handler;
 
-std_msgs::Int16MultiArray array;
-Servo servos[servoSum];
-
 // ============================== callback ==============================
 
 void set_target(MotorHandler *mh, MotorHandler *mh_st, double target_vel, double target_deg_st)
@@ -64,24 +52,6 @@ void set_target(MotorHandler *mh, MotorHandler *mh_st, double target_vel, double
   mh -> target_vel = target_vel;
   mh_st -> target_vel = (target_deg_st) * ENC_PER_DEG;
 }
-
-void servoDegCB(const std_msgs::Int16MultiArray& array)
-{
-  int index = array.data[0];
-  int deg = array.data[1];
-  if(index == -1)
-  {
-    servo_detach();
-  }
-  else
-  {    
-    servos[index].attach(index+7);  //pin: 2~14
-    servos[index].write(deg);
-  }
-}
-
-ros::Subscriber<std_msgs::Int16MultiArray>servo_sub("servo_deg",&servoDegCB);
-
 
 void wh_cb_rfront(const custom_msg::wh_msg& msg)
 {
@@ -111,38 +81,16 @@ ros::Subscriber<custom_msg::wh_msg>left_rear_sub("left_rear",wh_cb_lrear);
 
 // ==================== functions ==================== //
 
-void initServos() {
-
-
-  int i = 0;
-  for(i = 0; i < servoSum; i++) {
-    servos[i] = Servo();
-    servos[i].attach(i+7);  //pin: 2~14
-    servos[i].write(close_angle);
-    delay(1000);
-    servos[i].detach();
-  }
-}
-
-void servo_detach()
-{
-  int i = 0;
-  for(i = 0; i < servoSum; i++) {
-    servos[i].detach();
-  }  
-}
 
 void setup() {
   nh.getHardware()->setBaud(57600);
   Wire.begin();
   nh.initNode();
-  initServos();
   
   nh.subscribe(right_front_sub);
   nh.subscribe(right_rear_sub);
   nh.subscribe(left_front_sub);
   nh.subscribe(left_rear_sub);
-  nh.subscribe(servo_sub);
 
 /*
    servos[0].write(open_angle);

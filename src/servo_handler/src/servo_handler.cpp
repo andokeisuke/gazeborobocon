@@ -18,7 +18,7 @@ const int servoSum = 7;
 const int closeDeg = 0; // close deg
 const int openDeg = 105;   // open deg
 const int hz = 10;
-const int a = 0, b = 6, c = 5, d = 4, e = 3, f = 2, g = 1,servo_detach_flag = -1;
+const int a = 0, b = 1, c = 2, d = 3, e = 4, f = 5, g = 6,servo_detach_flag = -1;
 const int delaySmall = 1000, delayMedium = 3000, delayLong = 1500, delayShot = 1000, delayReset = 3000, delay2000 = 2000;
 
 // inner values

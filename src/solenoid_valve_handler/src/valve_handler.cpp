@@ -7,17 +7,14 @@
 
 //#include "conf.h"
 #define  VALVE_WAIT  1
-#define  VALVE_PREPARE  2
-#define  VALVE_GEREGE_PASS  3
-#define  VALVE_SHAGAI_GET  4
-#define  VALVE_SHAGAI_SHOOT  5
-#define  VALVE_CLOSE  6
+#define  VALVE_SHAGAI_PUSH  2
+#define  VALVE_SHAGAI_PULL  3
 
 // params
-const int servoSum = 7;                                           
+const int valveSum = 2;                                           
 const int hz = 10;
-const int a = 0, b = 6, c = 5, d = 4, e = 3, f = 2, g = 1,valve_detach_flag = -1;//pin_name
-const int delaySmall = 1000, delayMedium = 3000, delayLong = 1500, delayShot = 1000, delayReset = 3000, delay2000 = 2000;
+const int a = 0, b = 1;//pin_name
+const int delaySmall = 500;
 
 // inner values
 bool delaying = false; // for delay
@@ -26,11 +23,15 @@ int delayCounter = 0;
 int state = VALVE_WAIT;
 
 // ros values
-ros::Publisher valvePub;
+ros::Publisher valve_op_Pub;
+ros::Publisher valve_task_Pub;
+
 
 ros::Subscriber valveSub;
 
 custom_msg::valve_msg valve_op;
+std_msgs::Int8 valve_task_state;
+
 
 // =========== callback ==========
 void valveTaskCallback(const std_msgs::Int8::ConstPtr& m){
@@ -42,15 +43,15 @@ void valveTaskCallback(const std_msgs::Int8::ConstPtr& m){
 void sendValve_op(bool state, int number) {
   valve_op.state = state;
   valve_op.valve_number = number;
-  valvePub.publish(valve_op);
+  valve_op_Pub.publish(valve_op);
 }
 
-void sOpen(int valveNo) {
-  sendValve_op(valveNo, true);  
+void valveOpen(int valveNo) {
+  sendValve_op(false,valveNo);  
 }
 
-void sClose(int valveNo) {
-  sendValve_op(valveNo, false);  
+void valveClose(int valveNo) {
+  sendValve_op(true,valveNo);  
 }
 
 void delayCount() {
@@ -61,8 +62,9 @@ void delayCount() {
 
     if(final_delay == true)
     {
-      state = VALVE_WAIT;
-      sendValve_op(-1,false);  
+      valve_task_state.data = VALVE_WAIT;
+      valve_task_Pub.publish(valve_task_state);
+      sendValve_op(false,-1);//all close
       final_delay = false;
     }
 
@@ -76,132 +78,41 @@ void delay(int ms) {
 }
 
 // =========== routine ==========
-void setup() {
-  ROS_INFO("setup");
-  int i = 0;
-  for (i = 0; i < servoSum; i++) {
-    sClose(i);
-  }
-}
-
-void prepare() {
+void wait() {
   // ready for shooting shygai
   static int mode = 0;
    if(mode==0){
-    ROS_INFO("prepare");
-    sOpen(e);
-    sOpen(a);
+    ROS_INFO("wait");
+    valveClose(a);
+    valveClose(b);
     delay(delaySmall);
-    mode = 1;
-  } else if (mode == 1) {
-    sOpen(d);
-    delay(delaySmall);
-    mode = 2;
-  } else if (mode == 2) {
-    sClose(d);
-    delay(delaySmall);
-    mode = 3;
-  } else if (mode == 3) {
-    sOpen(c);
-    sClose(a);
-    delay(delaySmall);
-    final_delay = true;
     mode = 0;
-  } 
-  
+    final_delay = true;
+  }
 }
 
-void Grege_pass(){
+void Shagai_push(){
     static int mode = 0;
     if (mode == 0) {
-      ROS_INFO("Gerege_pass");
-      sOpen(g);
+      ROS_INFO("Shagai_push");
+      valveOpen(a);
+      valveClose(b);
       delay(delaySmall);
       final_delay = true;
       mode = 0;
     }
 }
 
-void Shagai_get(){
+void Shagai_pull(){
     static int mode = 0;
     if (mode == 0) {
-      ROS_INFO("Shagai_get");
-      // shot
-      sOpen(f);
-      delay(delaySmall);
-      mode = 1;
-    } else if (mode ==1) {
-      // shot done
-      sClose(f);
+      ROS_INFO("Shagai_pull");
+      valveOpen(b);
+      valveClose(a);
       delay(delaySmall);
       final_delay = true;
       mode = 0;
-    } 
-}
-
-void Shagai_shoot() {
-    static int mode = 0;
-    if (mode == 0) {
-      ROS_INFO("Shagai_shoot");
-      //flagup
-      sOpen(b);
-      delay(delaySmall);
-      mode = 1;
-    } else if (mode ==1) {
-      // shot done
-      sClose(b);
-      delay(delaySmall);
-      mode = 2;
-    } else if (mode == 2) {
-      // prepare exhaust
-      sOpen(a);
-      sClose(c);
-      delay(delaySmall);
-      mode = 3;
-    } else if (mode == 3) {
-    sOpen(d);
-    delay(delaySmall);
-    mode = 4;
-  } else if (mode == 4) {
-    sClose(d);
-    delay(delaySmall);
-    mode = 5;
-  } else if (mode == 5) {
-    sOpen(c);
-    sClose(a);
-    delay(delaySmall);
-    final_delay = true;
-    mode = 0;
-  }
-}
-
-void all_close(){
-    static int mode = 0;
-    if (mode == 0) {
-      ROS_INFO("all_close");
-      //flagup
-      sClose(a);
-      sClose(b);
-      delay(delaySmall);
-      mode = 1;
-    } else if (mode ==1) {
-      // shot done
-      sClose(c);
-      sClose(d);
-      delay(delaySmall);
-      mode = 2;
-    } else if (mode == 2) {
-      // prepare exhaust
-      sClose(e);
-      sClose(f);
-      delay(delaySmall);
-      mode = 3;
-    } else if (mode == 3) {
-    sClose(g);
-    delay(delaySmall);
-    final_delay = true;
-    mode = 0;
-  }
+    }
 }
 
 void task() {
@@ -209,23 +120,13 @@ void task() {
   if (state == VALVE_WAIT) {
 	ROS_INFO("Wait\n");
     //pass
-  } else if (state == VALVE_PREPARE) {
-    ROS_INFO("prepare\n");
-    prepare();
-  } else if (state == VALVE_GEREGE_PASS) {
-  ROS_INFO("Pass Gerege\n");
-    Grege_pass();
-  } else if (state == VALVE_SHAGAI_GET) {
-  ROS_INFO("Get Shagai\n");
-    Shagai_get();
-  } else if (state == VALVE_SHAGAI_SHOOT) {
-  ROS_INFO("Shoot Shagai\n");
-    Shagai_shoot();
-  } else if (state == VALVE_CLOSE) {
-  ROS_INFO("close\n");
-    all_close();
+  } else if (state == VALVE_SHAGAI_PUSH) {
+    ROS_INFO("shgai_push\n");
+    Shagai_push();
+  } else if (state == VALVE_SHAGAI_PULL) {
+    ROS_INFO("shagai_pull\n");
+    Shagai_pull();
   }
-  
 }
 
 int main(int argc, char **argv)
@@ -233,7 +134,9 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "valve_handler");
   ros::NodeHandle n; 
 
-  valvePub = n.advertise<custom_msg::valve_msg>("valve_op", 1);
+  valve_op_Pub = n.advertise<custom_msg::valve_msg>("valve_op", 1);
+  valve_task_Pub = n.advertise<std_msgs::Int8>("valve_task", 1);
+
 
   valveSub = n.subscribe("valve_task", 1, valveTaskCallback);
 

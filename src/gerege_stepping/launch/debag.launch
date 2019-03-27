@@ -1,13 +1,12 @@
 <launch>
 
- <node name="valve_handler" type="valve_handler" pkg="solenoid_valve_handler" output="screen" />
+ <node name="gerege_stepping" type="gerege_stepping" pkg="gerege_stepping"/>
 
- <node name="control" type="control" pkg="control" output="screen"/>
+ <node name="control" type="control" pkg="control" />
 
 <!--joy node-->
 <node pkg="joy" type="joy_node" name="joy_node">
 </node>
-
 
 <node
  pkg="rosserial_python"

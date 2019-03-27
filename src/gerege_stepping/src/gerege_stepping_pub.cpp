@@ -9,6 +9,7 @@ bool gerege_pass_state = false;
 
 // inner values
 bool delaying = false; // for delay
+bool final_delay = false;
 int delayCounter = 0;
 
 ros::Subscriber gerege_state_sub;
@@ -24,9 +25,15 @@ void delayCount() {
     delayCounter--;
   } else {
     delaying = false;
-    state.data = false;
-    gerege_state_pub.publish(state);
   }
+
+    if(final_delay == true)
+    {
+      state.data = false;
+      gerege_state_pub.publish(state);
+      final_delay = false;
+    }
+
 }
 
 void delay(int ms) {
@@ -55,6 +62,7 @@ void Gerege_pass(){
       deg.data = 0;
       deg_pub.publish(deg); //publish msg
       delay(delaySmall);
+      final_delay = true;
       mode = 0;
     } 
 }
