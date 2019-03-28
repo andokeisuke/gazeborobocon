@@ -12,14 +12,7 @@ ti2c(i2caddr){
   //initializer
   this->addr = i2caddr;
 }
-void IseMotorDriver::setPid(double p,double i,double d){
 
-  char buf[1000];
-  sprintf(buf, "a:p=%10.10lf,i=%10.10lf,d=%10.10lf,",p,i,d);
-  this->ti2c.sendStr(buf);
-
-  
-  }
 void IseMotorDriver::setSpeed(int power){
   //@param pw: -100~100
   char buf[10];

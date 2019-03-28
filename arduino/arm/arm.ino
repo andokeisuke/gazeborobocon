@@ -7,8 +7,6 @@
 
 #include <ros.h>
 #include <std_msgs/Int16.h>
-#include <std_msgs/Bool.h>
-
 #include <gerege_stepping/gerege_stepping_msg.h>
 #include "ti2c.h"
 #include "ise_motor_driver.h"
@@ -20,21 +18,15 @@ int tar_arm_deg = 0;
 int power = 0;
 
 
-int pin = 7; //ピン番号
-int cw  =  6;  //CW
-float pw = 1.5; //パルス幅
-bool dir = false; //回転方向
-int tim  = 0; //動かす時間
+int pin; //ピン番号
+int cw;  //CW
+float pw; //パルス幅
+bool dir; //回転方向
+int tim; //動かす時間
 bool check;
 
-
-int vacuum_motor1_pin = 5;
-int vacuum_motor2_pin = 3;
-bool vacuum_state = false;
-
- 
-
 ros::NodeHandle nh;
+gerege_stepping::gerege_stepping_msg msg;
 
 class MotorHandler
 {
@@ -109,60 +101,37 @@ void set_target(struct MotorHandler *mh_arm, double target_deg)
 }
 
 void messageCallback(const gerege_stepping::gerege_stepping_msg& msg) {
+  dir = msg.dir;
+  if (check == dir) {
+    pin = msg.pin;
+    cw = msg.cw;
+    pw = msg.pw;
+    tim = msg.tim;
 
-  if ( msg.tim != 0)
-  {
-    dir = msg.dir;
-    if (check == dir) {
-      pin = msg.pin;
-      cw = msg.cw;
-      pw = msg.pw;
-      tim = msg.tim;
+    pinMode(pin, OUTPUT);
+    pinMode(cw, OUTPUT);
+    digitalWrite(cw, dir);
+    FlexiTimer2::set(pw, 1 / 10, stepp);
+    FlexiTimer2::start();
 
-      pinMode(pin, OUTPUT);
-      pinMode(cw, OUTPUT);
-      digitalWrite(cw, dir);
-      FlexiTimer2::set(pw, 1 / 10, stepp);
-      FlexiTimer2::start();
+    delay(tim);
+    FlexiTimer2::stop();
+    check = !dir;
 
-      delay(tim);
-      FlexiTimer2::stop();
-      check = !dir;
-    }
   }
 }
 
-void arm_deg_Callback(const std_msgs::Int16& deg) {
+void arm_deg_Callback(const std_msgs::Int16& deg){
 
   tar_arm_deg = deg.data;
 }
 
-void vacuum_Callback(const std_msgs::Bool& vacuum_task_state) {
-
-  vacuum_state = vacuum_task_state.data;
-
-  if(vacuum_state == true)
-  {
-     digitalWrite(vacuum_motor1_pin, HIGH);
-     digitalWrite(vacuum_motor2_pin, HIGH);
-  }
-  else if(vacuum_state == false)
-  {
-     digitalWrite(vacuum_motor1_pin, LOW);
-     digitalWrite(vacuum_motor2_pin, LOW);
-  }
-
-  
-}
-
-
 ros::Subscriber<gerege_stepping::gerege_stepping_msg> stepp_sub("stepping_var", messageCallback);
 ros::Subscriber<std_msgs::Int16> arm_deg_sub("tar_arm_deg", arm_deg_Callback);
-ros::Subscriber<std_msgs::Bool> vacuum_sub("vacuum_motor_state", vacuum_Callback);
 
 
 // ==================== functions ==================== //
-void setMotorHandlerArm(struct MotorHandler *mh) {
+ void setMotorHandlerArm(struct MotorHandler *mh) {
   mh->KP = 0.00001;
   mh->KI = 0.0000;
   mh->KD = 0.0000;
@@ -194,54 +163,48 @@ void stepp() {
 
 void setup() {
 
-  nh.getHardware()->setBaud(57600);
   nh.initNode();
 
   nh.subscribe(stepp_sub);
   nh.subscribe(arm_deg_sub);
-  nh.subscribe(vacuum_sub);
 
   check = dir;
 
-  pinMode(vacuum_motor1_pin, OUTPUT);
-  pinMode(vacuum_motor2_pin, OUTPUT);
-  
-  digitalWrite(vacuum_motor1_pin, LOW);   // LEDをオン
-  digitalWrite(vacuum_motor2_pin, LOW);   // LEDをオン
+
   Wire.begin();
+  Serial.begin(115200);
+  Serial.println("start");
 
-  //  set_target(&right_arm_handler, tar_arm_deg);
-  //  set_target(&left_arm_handler, -tar_arm_deg);
+//  set_target(&right_arm_handler, tar_arm_deg);
+//  set_target(&left_arm_handler, -tar_arm_deg);
 
-  //  setMotorHandlerArm(&right_arm_handler);
-  //  setMotorHandlerArm(&left_arm_handler);
+//  setMotorHandlerArm(&right_arm_handler);
+//  setMotorHandlerArm(&left_arm_handler);
 
 }
 
 void loop() {
-  /*
-    calc_now_vel();
-    Serial.print(right_arm_handler.target_vel);
-
-    right_arm.setSpeed(right_arm_handler.pid_control());
-    left_arm.setSpeed((-right_arm_handler.power));
-
-    Serial.print("power");
-    //     Serial.print(right_arm_handler.power);
-    Serial.print(right_arm_handler.power);
-
-
-    Serial.print("enc");
-    //     Serial.println(right_arm_handler.enc);
-    Serial.println(right_arm_handler.enc);
-  */
-
 /*
-  if (tar_arm_deg > 0)
+  calc_now_vel();
+  Serial.print(right_arm_handler.target_vel);
+
+  right_arm.setSpeed(right_arm_handler.pid_control());
+  left_arm.setSpeed((-right_arm_handler.power));
+
+  Serial.print("power");
+  //     Serial.print(right_arm_handler.power);
+  Serial.print(right_arm_handler.power);
+
+
+  Serial.print("enc");
+  //     Serial.println(right_arm_handler.enc);
+  Serial.println(right_arm_handler.enc);
+*/
+  if(tar_arm_deg > 0)
   {
     power = 30;
   }
-  else if (tar_arm_deg < 0)
+  else if(tar_arm_deg < 0)
   {
     power = -30;
   }
@@ -252,8 +215,8 @@ void loop() {
 
   right_arm.setSpeed(power);
   left_arm.setSpeed(-power);
-*/
- // delay(5);
+
+  delay(5);
   nh.spinOnce();
 
 }

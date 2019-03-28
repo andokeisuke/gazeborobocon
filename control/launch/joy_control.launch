@@ -1,0 +1,13 @@
+<launch>
+<!--joy node-->
+<node pkg="joy" type="joy_node" name="joy_node">
+<param name="dev" type="string" value="/dev/input/js0"/>
+</node>
+
+<!--tc_joy-->
+
+<node pkg="control" type="control" name="control_node" output="screen" />
+
+
+</launch>
+
