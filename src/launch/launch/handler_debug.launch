@@ -1,0 +1,9 @@
+<launch>
+
+<include file="$(find control)/launch/joy_control.launch"/>
+
+ <node name="servo_handler" type="servo_handler" pkg="servo_handler" output="screen" />
+
+ <node name="valve_handler" type="valve_handler" pkg="solenoid_valve_handler" output="screen" />
+
+</launch>

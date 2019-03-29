@@ -8,26 +8,31 @@
 
 
 
-#define MAX_VEL 0.5//m/s         //launchファイルでなにも指定しなかったときの値
+#define MAX_VEL 			0.5//m/s //launchファイルでなにも指定しなかったときの値
+#define MIN_VEL 			-0.5//m/s
+#define MAX_ANGULAR_VEL 	2.3//m/s
+#define MIN_ANGULAR_VEL 	-2.3//m/s
 
-#define MIN_VEL -0.5//m/s
-#define MAX_ANGULAR_VEL 2.3//m/s
-#define MIN_ANGULAR_VEL -2.3//m/s
-
-#define  SERVO_WAIT  1
-#define  SERVO_PREPARE  2
+#define  SERVO_WAIT  		1
+#define  SERVO_PREPARE  	2
 #define  SERVO_GEREGE_PASS  3
-#define  SERVO_SHAGAI_GET  4
-#define  SERVO_SHAGAI_SHOOT  5
-#define  SERVO_CLOSE  6
+#define  SERVO_SHAGAI_GET  	4
+#define  SERVO_SHAGAI_SHOOT 5
+#define  SERVO_CLOSE  		6
 
-#define  VALVE_WAIT  1
+#define  VALVE_WAIT         1
 #define  VALVE_SHAGAI_PUSH  2
 #define  VALVE_SHAGAI_PULL  3
+#define  VALVE_GEREGE_GET   4
+#define  VALVE_GEREGE_PASS  5
+
+#define  ARM_UP_DEG  		90
+#define  ARM_DOWN_DEG  		0
+#define  ARM_INITIAL_DEG  	135
 
 ros::Publisher twist_pub;
 ros::Publisher arm_deg_pub;
-ros::Publisher gerege_stepping_pub;
+ros::Publisher shagai_get_motor_pub;
 ros::Publisher servo_task_pub;
 ros::Publisher valve_task_pub;
 
@@ -39,7 +44,6 @@ ros::Subscriber valve_sub;
 int servo_state = SERVO_WAIT;
 int valve_state = VALVE_WAIT;
 
-
 class Joystick
 {
 public:
@@ -47,12 +51,9 @@ public:
 	float linear_y;
 	float right_spin;
 	float left_spin;
-	float arm_up;
-	float arm_down;
+	float shagai_shoot;
 	float gerege_pass;
-	float air_servo;
-	float shagai_sylinder;
-	float vacuum_motor;
+	float shagai_get;
 };
 
 Joystick Joystick;
@@ -65,15 +66,15 @@ void joy_Callback(const sensor_msgs::Joy& joy){
   Joystick.right_spin = joy.buttons[4];//L2ボタン(コントローラの5番)
   Joystick.left_spin  = joy.buttons[5];//R2ボタン(コントローラの6番)
 
-  Joystick.arm_up = joy.axes[3];//右のスティック上下
+//  Joystick.arm_up = joy.axes[3];//右のスティック上下
 
-  Joystick.gerege_pass = joy.buttons[2];//右の3番
+  Joystick.shagai_shoot = joy.buttons[2];//右の3番
 
-  Joystick.air_servo = joy.buttons[3];//右の4番 
+//  Joystick.air_servo = joy.buttons[3];//右の4番 
 
-  Joystick.shagai_sylinder = joy.buttons[0];//右の1番 
+  Joystick.gerege_pass = joy.buttons[0];//右の1番 
 
-  Joystick.vacuum_motor = joy.buttons[1];//
+  Joystick.shagai_get = joy.buttons[1];//右の2番
 
 }
 
@@ -99,11 +100,14 @@ int main(int argc, char** argv)
 {
 	int servo_count = 0;
 	int valve_count = 0;
+	int shoot_count = 0;
+	int shagai_get_count = 0;
 
-	float pre_servo_button_state = 0;
-	float pre_vacuum_button_state = 0;
+	int pre_shagai_get_button_state;
+
 
 	ros::init(argc, argv, "joy");
+
 	ros::NodeHandle n;
 	ros::NodeHandle pn("~");
 
@@ -121,11 +125,9 @@ int main(int argc, char** argv)
 	servo_sub = n.subscribe("servo_task", 1, servoTaskCallback);
 	valve_sub = n.subscribe("valve_task", 1, valveTaskCallback);
 
-
-
 	twist_pub = n.advertise<geometry_msgs::Twist>("sub",1);
 	arm_deg_pub = n.advertise<std_msgs::Int16>("tar_arm_deg",1);
-	gerege_stepping_pub = n.advertise<std_msgs::Bool>("gerege_pass_state",1);
+	shagai_get_motor_pub = n.advertise<std_msgs::Bool>("shagai_get_motor",1);
 	servo_task_pub = n.advertise<std_msgs::Int8>("servo_task",1);
 	valve_task_pub = n.advertise<std_msgs::Int8>("valve_task",1);
 
@@ -138,7 +140,7 @@ int main(int argc, char** argv)
 	std_msgs::Int8 valve_task;
 
 	std_msgs::Bool vacuum_task;
-	std_msgs::Bool gerege_pass_msg;
+	std_msgs::Bool shagai_get_motor_msg;
 
 
 	while(n.ok()){
@@ -161,111 +163,89 @@ int main(int argc, char** argv)
 		}    
 
 
-		
-		if(Joystick.arm_up == 0 &&Joystick.arm_down == 0)
-		{
-			deg.data = 0;
-		}    
-		else if(Joystick.arm_up == 1)
-		{
-			deg.data = -90;
-		}    
-		else if(Joystick.arm_down == 1)
-		{
-			deg.data = 90;
-		}    
 
-
-
-		if(Joystick.gerege_pass == 1)
+		if(Joystick.shagai_get == 1 && pre_shagai_get_button_state == 0)
 		{
-			gerege_pass_msg.data = true;
-			gerege_stepping_pub.publish(gerege_pass_msg);
-		}
-
-
-		if(pre_servo_button_state == 0 && Joystick.air_servo == 1 && servo_state == SERVO_WAIT)
-		{
-			switch (servo_count)
+			switch(shagai_get_count)
 			{
 				case 0:
-				
-					servo_task.data = SERVO_PREPARE;
-					servo_task_pub.publish(servo_task);		
-					servo_state = SERVO_PREPARE;
-					servo_count = 1;
-					break;
-				
-/*
-					servo_task.data = SERVO_SHAGAI_SHOOT;
-					servo_task_pub.publish(servo_task);		
-					servo_state = SERVO_SHAGAI_SHOOT;
-					servo_count = 0;
-					break;
-*/
-
-				case 1:	
-/*
-					servo_task.data = SERVO_GEREGE_PASS;
-					servo_task_pub.publish(servo_task);		
-					servo_state = SERVO_GEREGE_PASS;
-					servo_count = 2;
-					break;
-*/
-					servo_task.data = SERVO_SHAGAI_SHOOT;
-					servo_task_pub.publish(servo_task);		
-					servo_state = SERVO_SHAGAI_SHOOT;
-					servo_count = 1;
+					deg.data = ARM_DOWN_DEG;
+					arm_deg_pub.publish(deg);
+					shagai_get_count++;
 					break;
 
-				case 2:	
-					servo_task.data = SERVO_SHAGAI_GET;
-					servo_task_pub.publish(servo_task);		
-					servo_state = SERVO_SHAGAI_GET;
-					servo_count = 3;
+				case 1:
+					shagai_get_motor_msg.data = true;
+					shagai_get_motor_pub.publish(shagai_get_motor_msg);
+					shagai_get_count++;
 					break;
 
-				case 3:	
-					servo_task.data = SERVO_SHAGAI_SHOOT;
-					servo_task_pub.publish(servo_task);		
-					servo_state = SERVO_SHAGAI_SHOOT;
-					servo_count = 2;
+				case 2:
+					deg.data = ARM_INITIAL_DEG;
+					arm_deg_pub.publish(deg);
+					shagai_get_count++;
 					break;
 
+				case 3:
+					shagai_get_motor_msg.data = false;
+					shagai_get_motor_pub.publish(shagai_get_motor_msg);
+					shagai_get_count++;
+					break;
 
+				case 4:
+					deg.data = ARM_UP_DEG;
+					arm_deg_pub.publish(deg);
+					shagai_get_count = 0;
+					break;
 			}
+		}    
 
+		pre_shagai_get_button_state = Joystick.shagai_get;
+
+
+
+		if(Joystick.gerege_pass == 1 && valve_state == VALVE_WAIT)
+		{
+			valve_task.data = VALVE_GEREGE_PASS;
+			valve_task_pub.publish(valve_task);
+			valve_state = VALVE_GEREGE_PASS;
 		}
 
-		if(Joystick.shagai_sylinder == 1 && valve_state == VALVE_WAIT)
+		switch(shoot_count)
 		{
-			switch (valve_count)
-			{
-				case 0:
-				
+			case 0:
+				if(Joystick.shagai_shoot == 1 && valve_state == VALVE_WAIT && servo_state == SERVO_WAIT)
+				{
 					valve_task.data = VALVE_SHAGAI_PUSH;
 					valve_task_pub.publish(valve_task);		
 					valve_state = VALVE_SHAGAI_PUSH;
-					valve_count = 1;
-					break;
-				
-				case 1:	
+					shoot_count = 1;
+				}
+				break;
 
+			case 1:
+				if(valve_state == VALVE_WAIT)
+				{
+					servo_task.data = SERVO_SHAGAI_SHOOT;
+					servo_task_pub.publish(servo_task);		
+					servo_state = SERVO_SHAGAI_SHOOT;
+					shoot_count = 2;					
+				}
+				break;
+
+			case 2:
+				if(servo_state == SERVO_WAIT)
+				{
 					valve_task.data = VALVE_SHAGAI_PULL;
 					valve_task_pub.publish(valve_task);		
 					valve_state = VALVE_SHAGAI_PULL;
-					valve_count = 0;
-					break;
-			}
-
+					shoot_count = 0;					
+				}
+				break;
 		}
-
-		arm_deg_pub.publish(deg);
 
 		twist_pub.publish(twist);
 
-		pre_servo_button_state = Joystick.air_servo;
-		pre_vacuum_button_state= Joystick.vacuum_motor;
 		r.sleep();
 
 //		ROS_INFO("servo_state = %d",servo_state);
