@@ -4,10 +4,10 @@
 </node>
 <!--tc_joy-->
 <node pkg="control" type="control" name="control_node">
-	<param name="MAX_VEL" value="0.5"/>
-	<param name="MIN_VEL" value="-0.5"/>
-	<param name="MAX_ANGULAR_VEL" value="2.3"/>
-	<param name="MIN_ANGULAR_VEL" value="-2.3"/>
+	<param name="MAX_VEL" value="3.5"/>
+	<param name="MIN_VEL" value="-3.5"/>
+	<param name="MAX_ANGULAR_VEL" value="3.9"/>
+	<param name="MIN_ANGULAR_VEL" value="-3.9"/>
 </node>
 
 

@@ -40,31 +40,30 @@ void messageCallback(const geometry_msgs::Twist::ConstPtr& msg){
 		temp_v = angular_vel / WHEEL_RADIUS;
 		temp_theta = 0;
 
+
 		left_front.st_target_deg = 0;
 		left_rear.st_target_deg = 0;
 		right_rear.st_target_deg = 0;
 		right_front.st_target_deg = 0;
 
-		left_front.wh_target_vel = temp_v;
-		left_rear.wh_target_vel = temp_v;
-		right_rear.wh_target_vel = temp_v;
-		right_front.wh_target_vel = temp_v;
+		left_front.wh_target_vel = -temp_v;
+		left_rear.wh_target_vel = -temp_v;
+		right_rear.wh_target_vel = -temp_v;
+		right_front.wh_target_vel = -temp_v;
 
 	}
 	else
 	{
-		if(msg->linear.y<0){
-			linear_vel = -linear_vel;
-		}
+		
 
 
 		temp_theta = atan2(msg->linear.y,msg->linear.x);
 		temp_v = linear_vel / WHEEL_RADIUS;
 
-		left_front.st_target_deg = temp_theta + M_PI/4;
-		left_rear.st_target_deg = temp_theta - M_PI/4;
-		right_rear.st_target_deg = temp_theta + M_PI/4;
-		right_front.st_target_deg = temp_theta - M_PI/4;
+		left_front.st_target_deg = -(temp_theta + M_PI/4)/M_PI*180;
+		left_rear.st_target_deg = -(temp_theta - M_PI/4)/M_PI*180;
+		right_rear.st_target_deg = -(temp_theta + M_PI/4)/M_PI*180;
+		right_front.st_target_deg = -(temp_theta - M_PI/4)/M_PI*180;
 
 		left_front.wh_target_vel = temp_v;
 		left_rear.wh_target_vel = temp_v;
