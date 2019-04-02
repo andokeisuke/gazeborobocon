@@ -7,11 +7,11 @@
 #include "kinjo_stp_motor_driver.h"
 
 const uint8_t gerege_st_addr = 0x33;
-const int servoSum = 7;
+const int servoSum = 5;
 const int close_angle = 0;
 const int open_angle = 90;
-const int valveSum = 2;
-const int valvePin[valveSum] = {31, 33} ;
+const int valveSum = 6;
+const int valvePin[valveSum] = {30, 32,34,36,38,40} ;
 
 Servo servos[servoSum];
 KinjoStMotorDriver gerege_motor = KinjoStMotorDriver(gerege_st_addr);
@@ -80,6 +80,16 @@ void servo_detach()
   }
 }
 
+void init_valve() {
+  int i = 0;
+  for (i = 0; i < valveSum; i++)
+  {
+    pinMode(valvePin[i], OUTPUT);
+    digitalWrite(valvePin[i], LOW);
+  }
+}
+
+
 void setup() {
   // put your setup code here, to run once:
   Wire.begin();
@@ -89,6 +99,7 @@ void setup() {
   nh.subscribe(valve_op_sub);
 
   initServos();
+  init_valve();
 }
 
 void loop() {

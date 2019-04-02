@@ -2,8 +2,8 @@
 
 #include <custom_msg/valve_msg.h>
 
-const int valveSum = 2;
-const int valvePin[valveSum] = {3, 6} ;
+const int valveSum = 6;
+const int valvePin[valveSum] = {30,32,34,36,38,40} ;
 
 void valveOpCB(const custom_msg::valve_msg &data)
 {

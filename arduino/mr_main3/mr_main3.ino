@@ -3,33 +3,28 @@
 #include <stdlib.h>
 
 #include <Wire.h>
-#include <Servo.h>
 
 #include <ros.h>
 #include <custom_msg/wh_msg.h>
 #include <std_msgs/Int8.h>
 #include <std_msgs/Int16.h>
-#include <std_msgs/Int16MultiArray.h>
-#include <std_msgs/MultiArrayLayout.h>
-#include <std_msgs/MultiArrayDimension.h>
-
 #include <std_msgs/Float64.h>
+#include <std_msgs/Bool.h>
+
 
 #include "ti2c.h"
 #include "ise_motor_driver.h"
+
 #define ENC_PER_DEG 11//１度のエンコーダの値
+#define ENC_PER_DEG_arm 11//アームを上げるための１度のエンコーダの値
+#define right_front_deg_init 475//right_frontポテンショメータの初期値
+#define right_rear_deg_init 495//right_rearポテンショメータの初期値
+#define left_front_deg_init 477//left_frontポテンショメータの初期値
+#define left_rear_deg_init 198//leftt_rearポテンショメータの初期値
+
+
 
 ros::NodeHandle  nh;
-
-double dt = 0.1;
-
-double Kp=1;
-double Ki=0.01;
-double Kd=0.01;
-
-double Kp_st=1;
-double Ki_st=0.01;
-double Kd_st=0.01;
 
 struct MotorHandler
 {
@@ -38,9 +33,6 @@ struct MotorHandler
 
 };
 
-const int servoSum = 7;
-const int close_angle = 0;
-const int open_angle = 90;
 
 
 // ============================== arguments ==============================
@@ -52,7 +44,11 @@ IseMotorDriver left_rear = IseMotorDriver(0x63);//63
 IseMotorDriver right_front_st = IseMotorDriver(0x24);//24
 IseMotorDriver right_rear_st = IseMotorDriver(0x35);//35
 IseMotorDriver left_front_st = IseMotorDriver(0x33);//33
-IseMotorDriver left_rear_st = IseMotorDriver(0x34);//34                                                             
+IseMotorDriver left_rear_st = IseMotorDriver(0x34);//34    
+
+IseMotorDriver arm_roll = IseMotorDriver(0x13);//13 
+IseMotorDriver arm_get_shagai = IseMotorDriver(0x30);//30 
+                                                         
 
 MotorHandler right_front_handler;
 MotorHandler right_rear_handler;
@@ -63,9 +59,6 @@ MotorHandler right_rear_st_handler;
 MotorHandler left_front_st_handler;
 MotorHandler left_rear_st_handler;
 
-std_msgs::Int16MultiArray array;
-Servo servos[servoSum];
-
 // ============================== callback ==============================
 
 void set_target(MotorHandler *mh, MotorHandler *mh_st, double target_vel, double target_deg_st)
@@ -74,14 +67,8 @@ void set_target(MotorHandler *mh, MotorHandler *mh_st, double target_vel, double
   mh_st -> target_vel = (target_deg_st) * ENC_PER_DEG;
 }
 
-void servoDegCB(const std_msgs::Int16MultiArray& array)
-{
-  int index = array.data[0];
-  int deg = array.data[1];
-  servos[index].write(deg);
-}
 
-ros::Subscriber<std_msgs::Int16MultiArray>servo_sub("servo_deg",&servoDegCB);
+
 
 
 void wh_cb_rfront(const custom_msg::wh_msg& msg)
@@ -118,73 +105,79 @@ void wh_cb_lrear(const custom_msg::wh_msg& msg)
   left_rear_st.setSpeed(left_rear_st_handler.target_vel);
 }
 
+void arm_roll_cb(const std_msgs::Int16& msg)
+{
+  arm_roll.setSpeed(msg.data);
+}
+
+void arm_get_shagai_cb(const std_msgs::Bool& msg)
+{
+  if(msg.data == true)
+  {
+    arm_get_shagai.setSpeed(-100 *ENC_PER_DEG_arm);  
+  }
+  else if(msg.data == false)
+  {
+    arm_get_shagai.setSpeed(0 * ENC_PER_DEG_arm);      
+  }
+}
+
 ros::Subscriber<custom_msg::wh_msg>right_front_sub("right_front",wh_cb_rfront);
 ros::Subscriber<custom_msg::wh_msg>right_rear_sub("right_rear",wh_cb_rrear);
 ros::Subscriber<custom_msg::wh_msg>left_front_sub("left_front",wh_cb_lfront);
 ros::Subscriber<custom_msg::wh_msg>left_rear_sub("left_rear",wh_cb_lrear);
 
-std_msgs::Float64 msg;
-ros::Publisher chatter("chatter", &msg);
+ros::Subscriber<std_msgs::Int16>arm_roll_sub("arm_pow",arm_roll_cb);
 
+ros::Subscriber<std_msgs::Bool>arm_get_shagai_sub("shagai_get",arm_get_shagai_cb);
 // ==================== functions ==================== //
 
 int vel_time = 0;
 
+void initialize(){//ステアを初期位置へ戻す関数
+
+   float right_front_degree = analogRead(A11);
+   float right_rear_degree = analogRead(A10);
+   float left_front_degree = analogRead(A9);
+   float left_rear_degree = analogRead(A8);
+
+   right_front_st.setSpeed(((right_front_deg_init-right_front_degree)/102)*360*11);
+   right_rear_st.setSpeed(((right_rear_deg_init-right_rear_degree)/102)*360*11);
+   left_front_st.setSpeed(((left_front_deg_init-left_front_degree)/102)*360*11);
+   left_rear_st.setSpeed(((left_rear_deg_init-left_rear_degree)/102)*360*11);
+
+  
+  
+  }
 
 void setup() {
+
+  
   Wire.begin();
   nh.initNode();
-  //initServos();
+
   
   nh.subscribe(right_front_sub);
   nh.subscribe(right_rear_sub);
   nh.subscribe(left_front_sub);
   nh.subscribe(left_rear_sub);
-  nh.subscribe(servo_sub);
+  nh.subscribe(arm_roll_sub);
+  nh.subscribe(arm_get_shagai_sub);
 
-  nh.advertise(chatter);
 
+//  nh.advertise(chatter);
+
+// initialize();
  
 
   
 }
 
-void initServos() {
-  int i = 0;
-  for(i = 0; i < servoSum; i++) {
-    servos[i] = Servo();
-    servos[i].attach(i+7);  //pin: 2~14
-    servos[i].write(close_angle);
-  }
-}
+
 
 void loop() {
- 
-
-  //right_front.setSpeed(right_front_handler.target_vel);
-  //right_rear.setSpeed(right_rear_handler.target_vel);
-  //left_front.setSpeed(left_front_handler.target_vel);
-  //left_rear.setSpeed(left_rear_handler.target_vel);
-//ROS_INFO(" [%f]",left_front_handler.pid_control());
-  //right_front_st.setSpeed(right_front_st_handler.target_vel);
-  //right_rear_st.setSpeed(right_rear_st_handler.target_vel);
-  
-  //left_front_st.setSpeed(1600);
-  //left_front_st.setSpeed(left_front_st_handler.target_vel);
-  //left_rear_st.setSpeed(left_rear_st_handler.target_vel);
-
-  msg.data = left_rear_handler.target_vel;
-  chatter.publish( &msg );
-  /*static int i = 0;
-  for(i = 0; i < servoSum; i++) {
-    servos[i].write(0);
-    delay(1000);
-  }
-
-  for(i = 0; i < servoSum; i++) {
-    servos[i].write(90);
-    delay(1000);
-  }*/
+//  msg.data = left_rear_handler.target_vel;
+//  chatter.publish( &msg );
 
  delay(5);
   nh.spinOnce();

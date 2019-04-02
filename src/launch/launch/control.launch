@@ -1,6 +1,8 @@
 <launch>
 
- <node name="tf_twist" type="tf_twist" pkg="tf_twist" />
+<!--
+<node name="tf_twist" type="tf_twist" pkg="tf_twist" />
+-->
 
 <include file="$(find control)/launch/joy_control.launch"/>
 
@@ -23,6 +25,7 @@
 <param name="port" value="/dev/ttyACM1"/>
 <param name="baud" value="57600"/>
 </node>
+!-->
 
 <node
  pkg="rosserial_python"
@@ -34,7 +37,6 @@
 <param name="port" value="/dev/ttyACM0"/>
 <param name="baud" value="57600"/>
 </node>
--->
 
 </launch>
 

@@ -26,9 +26,7 @@
 #define  VALVE_GEREGE_GET   4
 #define  VALVE_GEREGE_PASS  5
 
-#define  ARM_UP_DEG  		90
-#define  ARM_DOWN_DEG  		0
-#define  ARM_INITIAL_DEG  	135
+#define  ARM_POW  		25
 
 ros::Publisher twist_pub;
 ros::Publisher arm_deg_pub;
@@ -43,6 +41,7 @@ ros::Subscriber valve_sub;
 
 int servo_state = SERVO_WAIT;
 int valve_state = VALVE_WAIT;
+float now_arm_deg = 0.0;
 
 class Joystick
 {
@@ -54,6 +53,7 @@ public:
 	float shagai_shoot;
 	float gerege_pass;
 	float shagai_get;
+	float arm_up_down;
 };
 
 Joystick Joystick;
@@ -75,6 +75,9 @@ void joy_Callback(const sensor_msgs::Joy& joy){
   Joystick.gerege_pass = joy.buttons[0];//右の1番 
 
   Joystick.shagai_get = joy.buttons[1];//右の2番
+
+  Joystick.arm_up_down = joy.axes[5];//左の十字キー上下
+
 
 }
 
@@ -126,8 +129,8 @@ int main(int argc, char** argv)
 	valve_sub = n.subscribe("valve_task", 1, valveTaskCallback);
 
 	twist_pub = n.advertise<geometry_msgs::Twist>("sub",1);
-	arm_deg_pub = n.advertise<std_msgs::Int16>("tar_arm_deg",1);
-	shagai_get_motor_pub = n.advertise<std_msgs::Bool>("shagai_get_motor",1);
+	arm_deg_pub = n.advertise<std_msgs::Int16>("arm_pow",1);
+	shagai_get_motor_pub = n.advertise<std_msgs::Bool>("shagai_get",1);
 	servo_task_pub = n.advertise<std_msgs::Int8>("servo_task",1);
 	valve_task_pub = n.advertise<std_msgs::Int8>("valve_task",1);
 
@@ -169,9 +172,10 @@ int main(int argc, char** argv)
 			switch(shagai_get_count)
 			{
 				case 0:
-					deg.data = ARM_DOWN_DEG;
+//					deg.data = ARM_DOWN_DEG;
 					arm_deg_pub.publish(deg);
 					shagai_get_count++;
+//					now_arm_deg = ARM_DOWN_DEG;
 					break;
 
 				case 1:
@@ -181,9 +185,10 @@ int main(int argc, char** argv)
 					break;
 
 				case 2:
-					deg.data = ARM_INITIAL_DEG;
+//					deg.data = ARM_INITIAL_DEG;
 					arm_deg_pub.publish(deg);
 					shagai_get_count++;
+//					now_arm_deg = ARM_INITIAL_DEG;
 					break;
 
 				case 3:
@@ -193,14 +198,31 @@ int main(int argc, char** argv)
 					break;
 
 				case 4:
-					deg.data = ARM_UP_DEG;
+//					deg.data = ARM_UP_DEG;
 					arm_deg_pub.publish(deg);
 					shagai_get_count = 0;
+//					now_arm_deg = ARM_UP_DEG;
 					break;
 			}
 		}    
 
 		pre_shagai_get_button_state = Joystick.shagai_get;
+
+		if(Joystick.arm_up_down == 1)
+		{
+			deg.data = ARM_POW;
+			arm_deg_pub.publish(deg);
+		}
+		else if(Joystick.arm_up_down == -1)
+		{
+			deg.data = -ARM_POW;
+			arm_deg_pub.publish(deg);
+		}
+		else if(Joystick.arm_up_down == 0)
+		{
+			deg.data = 0;
+			arm_deg_pub.publish(deg);
+		}
 
 
 

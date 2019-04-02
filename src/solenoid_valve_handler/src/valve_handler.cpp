@@ -19,8 +19,8 @@
 // params
 const int valveSum = 6;                                           
 const int hz = 10;
-const int a = 0, b = 1, c = 2, d = 3, e = 4, f = 5;//
-const int delaySmall = 100 , delayLong = 2000 ;
+const int a = 4, b = 5, c = 2, d = 3, e = 0, f = 1;//
+const int delaySmall = 100 ,delay_Normal = 1000, delayLong = 2000 ;
 
 // inner values
 bool delaying = false; // for delay
@@ -89,7 +89,7 @@ void Shagai_push(){
     if (mode == 0) {
       valveOpen(e);
       valveClose(f);
-      delay(delaySmall);
+      delay(delay_Normal);
       final_delay = true;
       mode = 0;
     }
@@ -100,7 +100,7 @@ void Shagai_pull(){
     if (mode == 0) {
       valveOpen(f);
       valveClose(e);
-      delay(delaySmall);
+      delay(delay_Normal);
       final_delay = true;
       mode = 0;
     }
@@ -111,7 +111,7 @@ void Gerege_push(){
     if (mode == 0) {
       valveOpen(a);
       valveClose(b);
-      delay(delaySmall);
+      delay(delay_Normal);
 //      final_delay = true;
       mode = 0;
     }
@@ -122,7 +122,7 @@ void Gerege_pull(){
     if (mode == 0) {
       valveOpen(b);
       valveClose(a);
-      delay(delaySmall);
+      delay(delay_Normal);
 //      final_delay = true;
       mode = 0;
     }
@@ -143,7 +143,7 @@ void Gerege_pass(){
     static int mode = 0;
     if (mode == 0) {
       Gerege_push();
-      delay(delaySmall);
+//      delay(delay_Normal);
       mode = 1;
     }
     else if(mode == 1)
@@ -157,7 +157,7 @@ void Gerege_pass(){
     {
       Gerege_pull();
       final_delay = true;
-      delay(delaySmall);
+//      delay(delay_Normal);
       mode = 0;
     }
 }
