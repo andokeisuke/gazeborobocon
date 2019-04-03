@@ -7,7 +7,7 @@
 #include "kinjo_stp_motor_driver.h"
 
 const uint8_t gerege_st_addr = 0x33;
-const int servoSum = 5;
+const int servoSum = 4;
 const int close_angle = 0;
 const int open_angle = 90;
 const int valveSum = 6;

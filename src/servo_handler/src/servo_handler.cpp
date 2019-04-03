@@ -14,7 +14,7 @@
 #define  SERVO_CLOSE  6
 
 // params
-const int servoSum = 5;                                           
+const int servoSum = 4;                                           
 const int closeDeg = 0; // close deg
 const int openDeg = 105;   // open deg
 const int hz = 10;
@@ -149,36 +149,34 @@ void Shagai_shoot() {
     if (mode == 0) {
       ROS_INFO("Shagai_shoot");
       //flagup
-      sOpen(a);
+      sOpen(b);
       delay(delaySmall);
       mode = 1;
     } else if (mode ==1) {
       // shot done
-      sOpen(c);
-      sOpen(d);
+      sOpen(a);
       delay(delaySmall);
       mode = 2;
     } else if (mode == 2) {
       // shot done
-      sClose(c);
-      sClose(d);
+      sClose(a);
+      sClose(b);
       delay(delaySmall);
       mode = 3;
     }
     else if(mode == 3){
-      sOpen(b);
-      sOpen(e);
+      sOpen(d);
       delay(delaySmall);    	
       mode = 4;
     }
     else if(mode == 4){
       // prepare exhaust
-      sClose(b);
-      sClose(e);
+      sOpen(c);
       delay(delaySmall);
       mode = 5;
     }else if(mode == 5){
-    	sClose(a);      
+      sClose(c);
+      sClose(d);
     	final_delay = true;
     	delay(delaySmall);
     	mode = 0;
