@@ -9,14 +9,12 @@
 #include <std_msgs/Int8.h>
 #include <std_msgs/Int16.h>
 #include <std_msgs/Float64.h>
-#include <std_msgs/Bool.h>
 
 
 #include "ti2c.h"
 #include "ise_motor_driver.h"
 
 #define ENC_PER_DEG 11//１度のエンコーダの値
-#define ENC_PER_DEG_arm 11//アームを上げるための１度のエンコーダの値
 #define right_front_deg_init 475//right_frontポテンショメータの初期値
 #define right_rear_deg_init 495//right_rearポテンショメータの初期値
 #define left_front_deg_init 477//left_frontポテンショメータの初期値
@@ -44,11 +42,7 @@ IseMotorDriver left_rear = IseMotorDriver(0x63);//63
 IseMotorDriver right_front_st = IseMotorDriver(0x24);//24
 IseMotorDriver right_rear_st = IseMotorDriver(0x35);//35
 IseMotorDriver left_front_st = IseMotorDriver(0x33);//33
-IseMotorDriver left_rear_st = IseMotorDriver(0x34);//34    
-
-IseMotorDriver arm_roll = IseMotorDriver(0x13);//13 
-IseMotorDriver arm_get_shagai = IseMotorDriver(0x30);//30 
-                                                         
+IseMotorDriver left_rear_st = IseMotorDriver(0x34);//34                                                             
 
 MotorHandler right_front_handler;
 MotorHandler right_rear_handler;
@@ -105,31 +99,11 @@ void wh_cb_lrear(const custom_msg::wh_msg& msg)
   left_rear_st.setSpeed(left_rear_st_handler.target_vel);
 }
 
-void arm_roll_cb(const std_msgs::Int16& msg)
-{
-  arm_roll.setSpeed(msg.data);
-}
-
-void arm_get_shagai_cb(const std_msgs::Bool& msg)
-{
-  if(msg.data == true)
-  {
-    arm_get_shagai.setSpeed(-100 *ENC_PER_DEG_arm);  
-  }
-  else if(msg.data == false)
-  {
-    arm_get_shagai.setSpeed(0 * ENC_PER_DEG_arm);      
-  }
-}
-
 ros::Subscriber<custom_msg::wh_msg>right_front_sub("right_front",wh_cb_rfront);
 ros::Subscriber<custom_msg::wh_msg>right_rear_sub("right_rear",wh_cb_rrear);
 ros::Subscriber<custom_msg::wh_msg>left_front_sub("left_front",wh_cb_lfront);
 ros::Subscriber<custom_msg::wh_msg>left_rear_sub("left_rear",wh_cb_lrear);
 
-ros::Subscriber<std_msgs::Int16>arm_roll_sub("arm_pow",arm_roll_cb);
-
-ros::Subscriber<std_msgs::Bool>arm_get_shagai_sub("shagai_get",arm_get_shagai_cb);
 // ==================== functions ==================== //
 
 int vel_time = 0;
@@ -161,9 +135,6 @@ void setup() {
   nh.subscribe(right_rear_sub);
   nh.subscribe(left_front_sub);
   nh.subscribe(left_rear_sub);
-  nh.subscribe(arm_roll_sub);
-  nh.subscribe(arm_get_shagai_sub);
-
 
 //  nh.advertise(chatter);
 
