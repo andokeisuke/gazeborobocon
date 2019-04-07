@@ -8,10 +8,11 @@
 
 
 
-#define MAX_VEL 			0.5//m/s //launchファイルでなにも指定しなかったときの値
-#define MIN_VEL 			-0.5//m/s
-#define MAX_ANGULAR_VEL 	2.3//m/s
-#define MIN_ANGULAR_VEL 	-2.3//m/s
+
+#define MAX_VEL 			1.4//m/s //launchファイルでなにも指定しなかったときの値
+#define MIN_VEL 			-1.4//m/s
+#define MAX_ANGULAR_VEL 	1.4//m/s
+#define MIN_ANGULAR_VEL 	-1.4//m/s
 
 #define  SERVO_WAIT  		1
 #define  SERVO_PREPARE  	2
@@ -26,7 +27,9 @@
 #define  VALVE_GEREGE_GET   4
 #define  VALVE_GEREGE_PASS  5
 
-#define  ARM_POW  		25
+#define  ARM_UP_DEG  		90
+#define  ARM_DOWN_DEG  		180
+#define  ARM_INITIAL_DEG  	0
 
 ros::Publisher twist_pub;
 ros::Publisher arm_deg_pub;
@@ -41,7 +44,9 @@ ros::Subscriber valve_sub;
 
 int servo_state = SERVO_WAIT;
 int valve_state = VALVE_WAIT;
-float now_arm_deg = 0.0;
+
+
+float map(float x, float in_min, float in_max, float out_min, float out_max);
 
 class Joystick
 {
@@ -53,7 +58,6 @@ public:
 	float shagai_shoot;
 	float gerege_pass;
 	float shagai_get;
-	float arm_up_down;
 };
 
 Joystick Joystick;
@@ -76,8 +80,23 @@ void joy_Callback(const sensor_msgs::Joy& joy){
 
   Joystick.shagai_get = joy.buttons[1];//右の2番
 
-  Joystick.arm_up_down = joy.axes[5];//左の十字キー上下
 
+  geometry_msgs::Twist twist;
+  
+
+  twist.linear.x = map(Joystick.linear_x,-1,1,MIN_VEL,MAX_VEL);
+  twist.linear.y = map(Joystick.linear_y,-1,1,MIN_VEL,MAX_VEL);
+
+  if(Joystick.right_spin == 1)
+  {
+	twist.angular.z = MIN_ANGULAR_VEL;
+  }    
+  else if(Joystick.left_spin == 1)
+  {
+	twist.angular.z = MAX_ANGULAR_VEL;
+  }
+
+  twist_pub.publish(twist);
 
 }
 
@@ -129,8 +148,8 @@ int main(int argc, char** argv)
 	valve_sub = n.subscribe("valve_task", 1, valveTaskCallback);
 
 	twist_pub = n.advertise<geometry_msgs::Twist>("sub",1);
-	arm_deg_pub = n.advertise<std_msgs::Int16>("arm_pow",1);
-	shagai_get_motor_pub = n.advertise<std_msgs::Bool>("shagai_get",1);
+	arm_deg_pub = n.advertise<std_msgs::Int16>("tar_arm_deg",1);
+	shagai_get_motor_pub = n.advertise<std_msgs::Bool>("shagai_get_motor",1);
 	servo_task_pub = n.advertise<std_msgs::Int8>("servo_task",1);
 	valve_task_pub = n.advertise<std_msgs::Int8>("valve_task",1);
 
@@ -150,7 +169,7 @@ int main(int argc, char** argv)
 
 		ros::spinOnce();
 //		ROS_INFO("o");
-		geometry_msgs::Twist twist;
+		/*geometry_msgs::Twist twist;
   //  int temp_deg = 0;
 
 		twist.linear.x = map(Joystick.linear_x,-1,1,MIN_VEL_param,MAX_VEL_param);
@@ -158,13 +177,13 @@ int main(int argc, char** argv)
 
 		if(Joystick.right_spin == 1)
 		{
-			twist.angular.z = MAX_ANGULAR_VEL;
+			twist.angular.z = MIN_ANGULAR_VEL;
 		}    
 		else if(Joystick.left_spin == 1)
 		{
-			twist.angular.z = MIN_ANGULAR_VEL;
-		}    
-
+			twist.angular.z = MAX_ANGULAR_VEL;
+		}
+		
 
 
 		if(Joystick.shagai_get == 1 && pre_shagai_get_button_state == 0)
@@ -172,10 +191,9 @@ int main(int argc, char** argv)
 			switch(shagai_get_count)
 			{
 				case 0:
-//					deg.data = ARM_DOWN_DEG;
+					deg.data = ARM_DOWN_DEG;
 					arm_deg_pub.publish(deg);
 					shagai_get_count++;
-//					now_arm_deg = ARM_DOWN_DEG;
 					break;
 
 				case 1:
@@ -185,10 +203,9 @@ int main(int argc, char** argv)
 					break;
 
 				case 2:
-//					deg.data = ARM_INITIAL_DEG;
+					deg.data = ARM_INITIAL_DEG;
 					arm_deg_pub.publish(deg);
 					shagai_get_count++;
-//					now_arm_deg = ARM_INITIAL_DEG;
 					break;
 
 				case 3:
@@ -198,31 +215,14 @@ int main(int argc, char** argv)
 					break;
 
 				case 4:
-//					deg.data = ARM_UP_DEG;
+					deg.data = ARM_UP_DEG;
 					arm_deg_pub.publish(deg);
 					shagai_get_count = 0;
-//					now_arm_deg = ARM_UP_DEG;
 					break;
 			}
 		}    
 
 		pre_shagai_get_button_state = Joystick.shagai_get;
-
-		if(Joystick.arm_up_down == 1)
-		{
-			deg.data = ARM_POW;
-			arm_deg_pub.publish(deg);
-		}
-		else if(Joystick.arm_up_down == -1)
-		{
-			deg.data = -ARM_POW;
-			arm_deg_pub.publish(deg);
-		}
-		else if(Joystick.arm_up_down == 0)
-		{
-			deg.data = 0;
-			arm_deg_pub.publish(deg);
-		}
 
 
 
@@ -264,9 +264,9 @@ int main(int argc, char** argv)
 					shoot_count = 0;					
 				}
 				break;
-		}
+		}*/
 
-		twist_pub.publish(twist);
+		//twist_pub.publish(twist);
 
 		r.sleep();
 
