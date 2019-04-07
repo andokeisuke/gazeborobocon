@@ -12,6 +12,8 @@
 
 #define WHEEL_RADIUS 0.05
 
+float temp_theta = 0;
+
 ros::Subscriber sub;
 ros::Publisher	left_front_pub,
 				left_rear_pub,
@@ -25,15 +27,17 @@ void messageCallback(const geometry_msgs::Twist::ConstPtr& msg){
 	float left_rear_theta = 0;
 	float right_front_theta = 0;
 	float right_rear_theta = 0;
-	float temp_theta = 0;
+	//float temp_theta = 0;
 	float temp_v = 0;
 
 	float linear_vel , angular_vel;
 
 	linear_vel  = sqrt((msg->linear.x)*(msg->linear.x)+(msg->linear.y)*(msg->linear.y));
 	angular_vel = msg->angular.z;
-
-	if(linear_vel == 0)
+	
+	//if(linear_vel>1)linear_vel=1;
+	//if(linear_vel<-1)linear_vel=-1;
+	if(angular_vel != 0)
 	{
 
 
@@ -46,6 +50,8 @@ void messageCallback(const geometry_msgs::Twist::ConstPtr& msg){
 		right_rear.st_target_deg = 0;
 		right_front.st_target_deg = 0;
 
+		
+
 		left_front.wh_target_vel = -temp_v;
 		left_rear.wh_target_vel = -temp_v;
 		right_rear.wh_target_vel = -temp_v;
@@ -56,10 +62,12 @@ void messageCallback(const geometry_msgs::Twist::ConstPtr& msg){
 	{
 		
 
-
-		temp_theta = atan2(msg->linear.y,msg->linear.x);
+	        
+		if(!((msg->linear.y ==0)&&(msg->linear.x ==0)))
+		{                 
+			temp_theta = atan2(msg->linear.y,msg->linear.x);
+		}
 		temp_v = linear_vel / WHEEL_RADIUS;
-
 		left_front.st_target_deg = -(temp_theta + M_PI/4)/M_PI*180;
 		left_rear.st_target_deg = -(temp_theta - M_PI/4)/M_PI*180;
 		right_rear.st_target_deg = -(temp_theta + M_PI/4)/M_PI*180;
