@@ -26,7 +26,8 @@
 #define  VALVE_GEREGE_GET   4
 #define  VALVE_GEREGE_PASS  5
 
-#define  ARM_POW  		25
+#define  ARM_UP_POW  		25
+#define  ARM_SHAGAI_GET_POW 20
 
 ros::Publisher twist_pub;
 ros::Publisher arm_deg_pub;
@@ -130,7 +131,7 @@ int main(int argc, char** argv)
 
 	twist_pub = n.advertise<geometry_msgs::Twist>("sub",1);
 	arm_deg_pub = n.advertise<std_msgs::Int16>("arm_pow",1);
-	shagai_get_motor_pub = n.advertise<std_msgs::Bool>("shagai_get",1);
+	shagai_get_motor_pub = n.advertise<std_msgs::Int16>("shagai_get",1);
 	servo_task_pub = n.advertise<std_msgs::Int8>("servo_task",1);
 	valve_task_pub = n.advertise<std_msgs::Int8>("valve_task",1);
 
@@ -142,8 +143,8 @@ int main(int argc, char** argv)
 	std_msgs::Int8 servo_task;
 	std_msgs::Int8 valve_task;
 
-	std_msgs::Bool vacuum_task;
-	std_msgs::Bool shagai_get_motor_msg;
+//	std_msgs::Bool vacuum_task;
+	std_msgs::Int16 shagai_get_motor_msg;
 
 
 	while(n.ok()){
@@ -172,36 +173,15 @@ int main(int argc, char** argv)
 			switch(shagai_get_count)
 			{
 				case 0:
-//					deg.data = ARM_DOWN_DEG;
-					arm_deg_pub.publish(deg);
+					shagai_get_motor_msg.data = -ARM_SHAGAI_GET_POW;
+					shagai_get_motor_pub.publish(shagai_get_motor_msg);
 					shagai_get_count++;
-//					now_arm_deg = ARM_DOWN_DEG;
 					break;
 
 				case 1:
-					shagai_get_motor_msg.data = true;
+					shagai_get_motor_msg.data = ARM_SHAGAI_GET_POW-5;
 					shagai_get_motor_pub.publish(shagai_get_motor_msg);
-					shagai_get_count++;
-					break;
-
-				case 2:
-//					deg.data = ARM_INITIAL_DEG;
-					arm_deg_pub.publish(deg);
-					shagai_get_count++;
-//					now_arm_deg = ARM_INITIAL_DEG;
-					break;
-
-				case 3:
-					shagai_get_motor_msg.data = false;
-					shagai_get_motor_pub.publish(shagai_get_motor_msg);
-					shagai_get_count++;
-					break;
-
-				case 4:
-//					deg.data = ARM_UP_DEG;
-					arm_deg_pub.publish(deg);
 					shagai_get_count = 0;
-//					now_arm_deg = ARM_UP_DEG;
 					break;
 			}
 		}    
@@ -210,12 +190,12 @@ int main(int argc, char** argv)
 
 		if(Joystick.arm_up_down == 1)
 		{
-			deg.data = ARM_POW;
+			deg.data = ARM_UP_POW;
 			arm_deg_pub.publish(deg);
 		}
 		else if(Joystick.arm_up_down == -1)
 		{
-			deg.data = -ARM_POW;
+			deg.data = -ARM_UP_POW;
 			arm_deg_pub.publish(deg);
 		}
 		else if(Joystick.arm_up_down == 0)

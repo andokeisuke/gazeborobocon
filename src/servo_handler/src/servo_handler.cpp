@@ -15,8 +15,8 @@
 
 // params
 const int servoSum = 4;                                           
-const int closeDeg = 0; // close deg
-const int openDeg = 105;   // open deg
+const int closeDeg = 30; // close deg
+const int openDeg = 150;   // open deg
 const int hz = 10;
 const int a = 0, b = 1, c = 2, d = 3, e = 4, f = 5, g = 6,servo_detach_flag = -1;
 const int delaySmall = 1000, delayMedium = 3000, delayLong = 1500, delayShot = 1000, delayReset = 3000, delay2000 = 2000;
@@ -61,6 +61,9 @@ void delayCount() {
     delayCounter--;
   } else {
     delaying = false;
+    sendArr(servo_detach_flag,0);  
+    servop.data=state;
+    servoPub.publish(servop);
 
     if(final_delay == true)
     {
@@ -149,23 +152,23 @@ void Shagai_shoot() {
     if (mode == 0) {
       ROS_INFO("Shagai_shoot");
       //flagup
-      sOpen(b);
+      sOpen(d);
       delay(delaySmall);
       mode = 1;
     } else if (mode ==1) {
       // shot done
-      sOpen(a);
+      sOpen(b);
       delay(delaySmall);
       mode = 2;
     } else if (mode == 2) {
       // shot done
-      sClose(a);
+      sClose(d);
       sClose(b);
       delay(delaySmall);
       mode = 3;
     }
     else if(mode == 3){
-      sOpen(d);
+      sOpen(a);
       delay(delaySmall);    	
       mode = 4;
     }
@@ -176,7 +179,7 @@ void Shagai_shoot() {
       mode = 5;
     }else if(mode == 5){
       sClose(c);
-      sClose(d);
+      sClose(a);
     	final_delay = true;
     	delay(delaySmall);
     	mode = 0;
